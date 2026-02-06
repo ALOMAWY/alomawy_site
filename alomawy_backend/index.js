@@ -22,6 +22,9 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('Alomawy Backend is running');
+});
 app.use('/api/projects', projectRoutes);
 
 // MongoDB Connection
