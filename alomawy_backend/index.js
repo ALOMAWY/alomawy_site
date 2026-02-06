@@ -28,9 +28,24 @@ app.get('/', (req, res) => {
 app.use('/api/projects', projectRoutes);
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB successfully'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+const connectDB = async () => {
+  try {
+    if (mongoose.connection.readyState === 1) return;
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000, // Fail fast if connection issues
+      socketTimeoutMS: 45000, // Close sockets after 45s
+    });
+    console.log('Connected to MongoDB successfully');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+  }
+}
+
+// Ensure connection before handling requests (middleware approach)
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
