@@ -3,18 +3,18 @@
     "home": "Home",
     "services": "Services",
     "portfolio": "Portfolio",
-    "contact_us": "Contect Us",
+    "contact_us": "Contact Us",
     "about_us": "About Us",
     "social_media": "Social Media"
   },
   "info": {
     "welcome": "Hello Everyone",
-    "discription": {
+    "description": {
       "name": "I am Abdalrahman ALDABBAS.",
       "work": "I work as a front-end developer.",
       "from": "I am From Syria Damascus.",
       "website": "This Is A Simple Personal Website .",
-      "technoloji": "I developed this website using ReactJS."
+      "technology": "I developed this website using ReactJS."
     },
     "numbers": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
     "fullname": "Abdalrahman Aldabbas",
@@ -24,7 +24,7 @@
     "home": "Home",
     "services": "Services",
     "portfolio": "Portfolio",
-    "contact_us": "Contect Us",
+    "contact_us": "Contact Us",
     "about_us": "About Us",
     "social_media": "Social Media",
     "dash": "Admin-Dashboard"
@@ -60,9 +60,9 @@
     "placeholder": {
       "name": "Username",
       "email": "Email",
-      "massege": "Your Massage .."
+      "message": "Your Message .."
     },
-    "send": "Send Massege"
+    "send": "Send Message"
   },
   "socials": {
     "items": {
@@ -109,14 +109,14 @@
     "fullname": "Full Name :",
     "age": "Age :",
     "status": "Status : ",
-    "status_now": "Available To Work",
+    "status_now": "Not Working Now",
     "marital_status": "Marital Status :",
     "marital_status_now": "Single",
-    "work": "My Work :",
-    "work_now": "Front-End-Developer",
+    "work": "Work :",
+    "work_now": "Front-End Developer",
     "position": "Position :",
-    "position_now": "Jonior",
-    "exp": "Experiance :",
+    "position_now": "Junior",
+    "exp": "Experience :",
     "skills": "Skills :",
     "years": "Years",
     "months": "Months",
@@ -130,13 +130,17 @@
     "idea_source": "Idea Source :",
     "rate": "Rate (1 - 5) :",
     "visit_link": "Visit Link :",
-    "disc": "Discription :",
+    "disc": "Description :",
     "select_image_here": "Select Image Here",
     "change_image_here": "Change Image Here",
     "uploadingImage": "Uploading ...",
-    "add": "Add Project"
+    "add": "Add Project",
+    "add_project": "Add Project",
+    "success_add": "Added Successfully",
+    "projectImage": "Project Image"
   },
   "admin": {
+    "success": "Success!",
     "placeholder": {
       "email": "Email :",
       "pass": "Password :"
@@ -148,12 +152,14 @@
     "developer": "Developer :",
     "source": "Idea Source :",
     "type": "Type :",
-    "disc": "Discription :",
+    "disc": "Description :",
     "techs": "Technologies :",
     "langs": "Languages :",
+    "date": "Date :",
     "rate": "Rate :",
     "no_projects": "No Projects Added Yet",
     "no_projects_with_category": "No Projects With Category {{category}}",
+    "visit":"Visit",
     "category": {
       "all": "All",
       "website": "Website",
@@ -162,5 +168,17 @@
       "dashboard": "Dashboard",
       "app": "App"
     }
+  },
+  "footer": {
+    "address_title": "Sinanbey.JAD",
+    "city": "Bursa, Türkiye",
+    "about_title": "About My Website",
+    "about_desc": "This is a simple personal website built with React. It is a place where I share my thoughts and ideas.",
+    "rights": "All rights reserved."
+  },
+  "news": {
+    "title": "Latest News",
+    "no_news": "No news available at the moment.",
+    "subscribe": "Subscribe to our newsletter"
   }
 }

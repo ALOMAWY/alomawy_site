@@ -1,54 +1,77 @@
-# React + TypeScript + Vite
+# Alomawy Portal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A professional portfolio and services management platform built with React, TypeScript, and Firebase. This application serves as a personal brand website with a dynamic dashboard for managing content.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Personal Portfolio**: Showcase projects and professional experience.
+- **Service Management**: Display and manage services offered.
+- **Admin Dashboard**: Secure area for managing site content.
+- **Bilingual Support**: Full support for English and Arabic (RTL support).
+- **Theming System**: Custom theme color support with persistence.
+- **Responsive Design**: Optimized for all devices using Styled-Components.
+- **Auth & Database**: Integrated with Firebase for secure admin access and real-time data.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**: [React](https://reactjs.org/) + [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
+- **Database/Auth**: [Firebase](https://firebase.google.com/)
+- **Styling**: [Styled Components](https://styled-components.com/) + [FontAwesome](https://fontawesome.com/)
+- **Internationalization**: [i18next](https://www.i18next.com/)
+- **Navigation**: [React Router DOM](https://reactrouter.com/)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 📦 Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd alomawy
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**:
+   Create a `.env` file in the root directory and add your Firebase and Admin credentials:
+   ```env
+   VITE_FIREBASE_KEY=your_firebase_api_key
+   VITE_ADMIN_EMAIL=your_admin_email
+   VITE_ADMIN_PASSWORD=your_admin_password
+   ```
+
+4. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+
+## 🚀 Available Scripts
+
+- `npm run dev`: Starts the development server.
+- `npm run build`: Builds the application for production.
+- `npm run lint`: Runs ESLint to check for code quality.
+- `npm run preview`: Locally previews the production build.
+
+## 📁 Project Structure
+
+```text
+src/
+├── components/   # UI Components (Landing, Portfolio, Dashboard, etc.)
+├── data/         # Mock data or static constants
+├── lib/          # External library configurations (Firebase, Redux store)
+├── locals/       # Translation files (EN/AR)
+├── redux/        # Redux slices and logic
+├── utils/        # Helper functions
+├── App.tsx       # Main Application entry and Routing
+└── main.tsx      # React DOM rendering
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🔐 Admin Access
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+To access the dashboard:
+1. Navigate to `/dash`.
+2. Login with the credentials defined in your environment variables.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```

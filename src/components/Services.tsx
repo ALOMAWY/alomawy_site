@@ -36,12 +36,17 @@ const Styled_Service = styled.div`
   flex-direction: column;
   height: 250px;
   padding: 10px;
-  transition: 0.2s;
-  backdrop-filter: blur(5px);
+  transition: 0.3s ease;
+  width: calc(100% - 1rem);
+  
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 
   animation: serv 3s linear;
   animation-timeline: view(200px 40px);
-  width: calc(100% - 1rem);
 
   @media (max-width: 991px) {
     width: 90%;
@@ -50,6 +55,9 @@ const Styled_Service = styled.div`
   & .icon {
     svg {
       font-size: 1.6rem;
+      color: var(--main-color);
+      opacity: 0.8;
+      transition: 0.3s ease;
     }
   }
 
@@ -62,28 +70,23 @@ const Styled_Service = styled.div`
   & .explain {
     font-size: 0.6rem;
     line-height: 1.7;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     opacity: 0.7;
     max-width: 95%;
     text-align: center;
     color: var(--background-white-color);
   }
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 1px solid var(--main-color);
-    box-shadow: var(--background-main-color) 0px 0px 15px;
-    background-color: var(--background-main-color);
-    border-radius: 40px;
-    z-index: -1;
-  }
   &:hover {
-    transform: scale(1.05);
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--main-color);
+    box-shadow: 0 10px 30px rgba(var(--main-color-rgb), 0.2);
+
+    & .icon svg {
+      transform: scale(1.1);
+      opacity: 1;
+    }
   }
 `;
 

@@ -1,13 +1,14 @@
 html {
   scroll-behavior: smooth;
-  font-size: 20px;
+  font-size: 16px;
 }
 :root {
-  --main-color: #186ca4;
+  --main-color: #3498db;
+  --main-color-rgb: 52, 152, 219;
   --secondary-color: #fff;
-  --background-main-color: rgba(30, 57, 103, 0.5);
-  --background-white-color: rgba(255, 255, 255, 0.5);
-  --background-color: #000f18;
+  --background-main-color: rgba(0, 15, 24, 0.8);
+  --background-white-color: rgba(255, 255, 255, 0.1);
+  --background-color: #000c14;
 }
 * {
   transition: 0.3s;
@@ -56,32 +57,40 @@ a {
   opacity: 0.6;
 }
 
-/* Scroller  */
-/* Width and height of the scrollbar */
-div::-webkit-scrollbar {
-  width: 3px;
-  height: 3px;
-}
+/* Modern Glassify Scrollbar */
 ::-webkit-scrollbar {
-  width: 3px;
-  height: 3px;
+  width: 5px;
+  height: 5px;
 }
 
-/* Track (background of the scrollbar) */
 ::-webkit-scrollbar-track {
   background: transparent;
-  border-radius: 10px;
 }
 
-/* Handle (draggable part of the scrollbar) */
 ::-webkit-scrollbar-thumb {
-  background: var(--main-color);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--background-main-color);
+  background: rgba(var(--main-color-rgb), 0.4);
+  border-color: rgba(var(--main-color-rgb), 0.6);
+  box-shadow: 0 0 10px rgba(var(--main-color-rgb), 0.3);
 }
 
-/* Scroller  */
+::-webkit-scrollbar-thumb:active {
+  background: rgba(var(--main-color-rgb), 0.6);
+}
+/* Modern Glassify Scrollbar */
+
+@keyframes background-scroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 10000px 0;
+  }
+}

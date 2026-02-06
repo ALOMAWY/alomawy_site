@@ -10,11 +10,11 @@ export function setItemInLocalStorage<T>(key: string, value: T) {
 
 // Get Item From Local Storage
 
-export function getItemFromLocalStorage<T>(key: string, initalValue: T) {
+export function getItemFromLocalStorage<T>(key: string, initialValue: T) {
   try {
     const value = window.localStorage.getItem(key);
 
-    return value ? JSON.parse(value) : initalValue;
+    return value ? JSON.parse(value) : initialValue;
   } catch (error) {
     console.error(error);
   }

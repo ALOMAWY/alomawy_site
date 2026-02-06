@@ -1,12 +1,11 @@
-import { collection,  getDocs } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { db } from "../lib/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useMyContext } from "./Context";
-import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+
+const API_URL = 'http://localhost:5000';
 
 const Styled_Portfolio = styled.div`
   display: grid;
@@ -37,56 +36,72 @@ const Styled_Portfolio = styled.div`
 
 const Categories = styled.div`
   display: flex;
+  align-items: center;
   gap: 1rem;
   justify-content: center;
-  gap: 2rem;
   color: #fff;
   width: fit-content;
-  background: #00000035;
-  backdrop-filter: blur(10px);
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid var(--main-color);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  padding: 8px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   margin: 0 auto;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 
   @media (max-width: 991px) {
-    width: 100%;
-    gap: 1rem;
+    width: 95%;
+    gap: 0.5rem;
+    padding: 6px;
   }
 
   @media (max-width: 485px) {
     flex-wrap: wrap;
-    gap: 1rem;  
+    border-radius: 16px;
+  }
+`;
 
-}
+const CategoryItem = styled.div<{ $active?: boolean; $isCount?: boolean }>`
+  cursor: pointer;
+  padding: 10px 20px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  background: ${props => props.$active ? 'var(--main-color)' : 'transparent'};
+  color: ${props => props.$active ? '#fff' : 'rgba(255, 255, 255, 0.5)'};
+  box-shadow: ${props => props.$active ? '0 8px 20px -5px rgba(var(--main-color-rgb), 0.5)' : 'none'};
 
-
-  .category {
-    cursor: pointer;
-    background: #00000035;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 1rem;
-    position: relative;
-text-shadow: var(--main-color) -2px -2px 10px ;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0%;
-      height: 100%;
-      background: var(--background-main-color);
-      z-index: -1;
-      border-radius: 5px;
-      transition: 0.3s;
-      
-    }
-
-    &:hover::before {
-      
+  ${props => props.$isCount && `
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--main-color);
+    padding-left: 20px;
+    margin-left: 10px;
+    cursor: default;
+    border-radius: 0;
+    
+    @media (max-width: 485px) {
+      border-left: none;
       width: 100%;
+      text-align: center;
+      margin-left: 0;
+      padding: 5px;
+    }
+  `}
+
+  &:hover {
+    ${props => !props.$active && !props.$isCount && `
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      transform: translateY(-2px);
+    `}
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -94,28 +109,47 @@ const NoItemsMessage = styled.h1`
   width: fit-content;
   color: #fff;
   text-align: center;
-  margin: 3rem 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #00000035;
-  border-radius: 10px;
-  border: 1px solid var(--main-color);
-  backdrop-filter: blur(5px);
-  box-shadow: 0 0 10px 1px var(--main-color);
-  padding: 5rem;
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  padding: 3rem 4rem;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  opacity: 0.6;
   position: absolute;
-  top: 10px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+  width: 70%;
+  
+  @media (max-width: 768px) {
+    padding: 2rem;
+    font-size: 1rem;
+    width: 90%;
+  }
+`;
+
+const PortfolioSection = styled.div`
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 50px;
 `;
 
 const Portfolio = () => {
   const { newProject } = useMyContext();
   const { t } = useTranslation();
 
-  const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
 
   const [category, setCategory] = useState<string>("all");
-  const categories = [
+  const categoriesList = [
     { text: t("portfolio.category.all"), value: "all" },
     { text: t("portfolio.category.website"), value: "website" },
     { text: t("portfolio.category.game"), value: "game" },
@@ -124,7 +158,7 @@ const Portfolio = () => {
     { text: t("portfolio.category.app"), value: "app" },
   ];
 
-  const filterdProjects = useMemo(() => {
+  const filteredProjects = useMemo(() => {
     if (category === "all") {
       return projects;
     } else {
@@ -134,15 +168,12 @@ const Portfolio = () => {
 
   const handleFetchingData = async () => {
     try {
-      const quarySnapshot = await getDocs(collection(db, "projects"));
-
-      const data: ProjectData[] = [];
-
-      quarySnapshot.forEach((e) => data.push(e.data() as ProjectData));
-
+      const response = await fetch(`${API_URL}/api/projects`);
+      if (!response.ok) throw new Error('Failed to fetch projects');
+      const data = await response.json();
       setProjects(data);
     } catch (error) {
-      console.log(error);
+      console.error('Error fetching data from MongoDB:', error);
     }
   };
 
@@ -151,64 +182,34 @@ const Portfolio = () => {
   }, [newProject]);
 
   return (
-    <div style={{ minHeight: "calc(100vh - 130px)" }}>
+    <PortfolioSection>
       <Categories className="categories">
-        {categories.map((cate) => (
-          <div
+        {categoriesList.map((cate) => (
+          <CategoryItem
             key={cate.value}
-            className="category"
-            style={{
-              background: category == cate.value ? "var(--main-color)" : "",
-            }}
+            $active={category === cate.value}
             onClick={() => setCategory(cate.value)}
           >
             {cate.text}
-          </div>
+          </CategoryItem>
         ))}
-        <div
-          className="category"
-          style={{
-            borderRadius: 0,
-            paddingRight: " 1rem",
-            paddingLeft: " 1rem",
-            borderLeft: "3px solid var(--main-color)",
-          }}
-        >
-          {filterdProjects.length < 9 ? 0 : ""}
-          {filterdProjects.length}
-        </div>
+        <CategoryItem $isCount>
+          {filteredProjects.length < 10 ? `0${filteredProjects.length}` : filteredProjects.length}
+        </CategoryItem>
       </Categories>
       <Styled_Portfolio>
-        {filterdProjects.length ? (
-          filterdProjects.map((project) => (
-            <Card key={project.disc} project={project} />
-          ))
-        ) : (
-          <NoItemsMessage>
-            {t("portfolio.no_projects_with_category", { category })}
-          </NoItemsMessage>
-        )}
+        {filteredProjects.map((project) => (
+          <Card key={project._id} project={project} />
+        ))}
       </Styled_Portfolio>
-    </div>
+      {!filteredProjects.length && (
+        <NoItemsMessage>
+          {t("portfolio.no_projects")}
+        </NoItemsMessage>
+      )}
+    </PortfolioSection>
   );
 };
-
-interface ProjectData {
-  title: string;
-  image: string;
-  developer: string;
-  type: string;
-  source: string;
-  disc: string;
-  techs: string[];
-  langs: string[];
-  rate: string;
-  visit: string;
-}
-
-interface cardProps {
-  project: ProjectData;
-}
 
 const Rate = ({ rate, color }: { rate: string; color: string }) => {
   const rateFrom5: number = +rate / 20;
@@ -226,92 +227,136 @@ const Rate = ({ rate, color }: { rate: string; color: string }) => {
     </div>
   );
 };
-const StyledCard = styled.div`
+
+const StyledCard = styled.div<{ $color: string; $accent: string }>`
   width: 100%;
-  border: 1px solid;
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
   color: #fff;
-  backdrop-filter: blur(6px);
-  border-radius: 5px;
+  box-shadow: 
+    0 10px 30px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
 
   &:hover {
-    scale: 1.02;
-  }
-
-  @media (max-width: 991px) {
-    width: 90%;
-    margin: 0 auto;
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: ${props => props.$color}50;
+    box-shadow: 
+      0 20px 40px -15px rgba(0, 0, 0, 0.6),
+      0 0 20px -5px ${props => props.$color}30,
+      inset 0 1px 1px rgba(255, 255, 255, 0.15);
   }
 
   h1 {
-    font-size: 1.2rem;
-    margin: 15px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    margin: 0 0 16px 0;
     text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(to right, #fff, ${props => props.$color});
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
-  .image {
-    width: 80%;
-    margin: 15px auto;
+  .image-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.4));
+    }
 
     img {
       width: 100%;
-      aspect-ratio: 16 / 9;
-      border: 1px solid #ffffff50;
-      border-radius: 20px;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
+  }
+
+  &:hover .image-container img {
+    transform: scale(1.1);
   }
 
   .infos {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 12px;
+    margin-bottom: 24px;
 
-    & .info {
-      width: 100%;
+    .info {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 10px;
-      background: #00000035;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.02);
 
-      span {
-        &:nth-child(1) {
-          width: 38%;
-        }
-        &:nth-child(2) {
-          width: 62%;
-        }
+      .label {
+        opacity: 0.4;
+        text-transform: uppercase;
+        font-weight: 900;
+        letter-spacing: 1px;
+        font-size: 0.7rem;
       }
 
-      .scroll {
-        padding-bottom: 5px;
-        overflow-x: auto;
+      .value {
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
-        text-transform: uppercase;
-
-        span {
-          text-transform: uppercase;
-        }
+        max-width: 60%;
       }
     }
   }
 
-  .visit {
-    display: block;
-    width: 50%;
+  .visit-btn {
+    margin-top: auto;
+    width: 100%;
+    padding: 16px;
+    background: ${props => props.$accent};
+    border: 1px solid ${props => props.$color}40;
+    border-radius: 16px;
+    color: #fff;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    transition: all 0.3s ease;
     text-align: center;
-
-    border-radius: 20px;
-    padding: 10px;
-    margin: 1rem auto;
+    text-decoration: none;
 
     &:hover {
-      opactiy: 0.5;
-      button {
-        letter-spacing: 5px;
-      }
+      background: ${props => props.$color};
+      box-shadow: 0 0 20px ${props => props.$color}50;
+      transform: scale(1.02);
+    }
+    
+    &:active {
+      transform: scale(0.98);
     }
   }
 `;
-const Card = ({ project }: cardProps) => {
+
+const Card = ({ project }: any) => {
   const { t } = useTranslation();
 
   const {
@@ -328,101 +373,84 @@ const Card = ({ project }: cardProps) => {
   } = project;
 
   let color: string = "";
+  let accentBg: string = "";
 
   switch (type) {
     case "website":
-      color = "#186ca4";
+      color = "#3498db";
+      accentBg = "rgba(52, 152, 219, 0.1)";
       break;
-
     case "game":
-      color = "#673ab7";
-
+      color = "#9b59b6";
+      accentBg = "rgba(155, 89, 182, 0.1)";
       break;
-
     case "simple":
-      color = "#51ad24";
+      color = "#2ecc71";
+      accentBg = "rgba(46, 204, 113, 0.1)";
       break;
-
     case "dashboard":
-      color = "#ff9800";
+      color = "#f1c40f";
+      accentBg = "rgba(241, 196, 15, 0.1)";
       break;
-
     case "app":
-      color = "#9c27b0";
+      color = "#e91e63";
+      accentBg = "rgba(233, 30, 99, 0.1)";
       break;
-
     default:
-      color = "#186ca4";
+      color = "#3498db";
+      accentBg = "rgba(52, 152, 219, 0.1)";
       break;
   }
 
+  const projectImage = image?.startsWith('/uploads') ? `${API_URL}${image}` : image;
+
   return (
-    <StyledCard
-      style={{
-        boxShadow: `0 0 20px 1px ${color}`,
-        background: color + "30",
-        borderColor: color,
-        textShadow: ` ${color} 0 0 10px`,
-      }}
-    >
+    <StyledCard $color={color} $accent={accentBg}>
       <h1>{title}</h1>
-      <div className="image">
-        <img src={image || "./assets/project-placeholder.png"} alt="Project" />
+      <div className="image-container">
+        <img src={projectImage || "./assets/project-placeholder.png"} alt="Project" />
       </div>
 
       <div className="infos">
         <div className="info">
-          <span>{t("portfolio.developer")}</span>
-          <span>{developer}</span>
+          <span className="label text-color-main">{t("portfolio.developer")}</span>
+          <span className="value">{developer}</span>
         </div>
 
         <div className="info">
-          <span>{t("portfolio.type")}</span>
-          <span>{type}</span>
+          <span className="label">{t("portfolio.type")}</span>
+          <span className="value">{type}</span>
         </div>
 
         <div className="info">
-          <span>{t("portfolio.source")}</span>
-          <span className="itrable scroll">{source}</span>
+          <span className="label">{t("portfolio.source")}</span>
+          <span className="value">{source}</span>
         </div>
 
         <div className="info">
-          <span>{t("portfolio.disc")}</span>
-          <span className="scroll">{disc}</span>
+          <span className="label">{t("portfolio.disc")}</span>
+          <span className="value">{disc}</span>
         </div>
 
         <div className="info">
-          <span>{t("portfolio.techs")}</span>
-          <span className="itrable scroll">
-            {techs.map((e) => (
-              <span key={e}> {e} ,</span>
+          <span className="label">{t("portfolio.techs")}</span>
+          <span className="value">
+            {techs?.map((e: any, i: number) => (
+              <span key={i}>{e}{i < techs.length - 1 ? ", " : ""}</span>
             ))}
           </span>
         </div>
 
         <div className="info">
-          <span>{t("portfolio.langs")}</span>
-          <div className="itrable scroll">
-            {langs.map((e) => (
-              <span key={e}> {e} </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="info">
-          <span>{t("portfolio.rate")}</span>
-          <span>
+          <span className="label">{t("portfolio.rate")}</span>
+          <span className="value">
             <Rate rate={rate} color={color} />
           </span>
         </div>
       </div>
 
-      <a
-        href={visit}
-        style={{ border: `1px dashed ${color}` }}
-        className="visit"
-      >
-        <button>Visit</button>
+      <a href={visit} className="visit-btn" target="_blank" rel="noreferrer">
+        {t("portfolio.visit") || "Visit"}
       </a>
     </StyledCard>
   );

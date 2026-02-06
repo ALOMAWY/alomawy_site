@@ -22,4 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# My added
 .env
+backup
+src_old
+myChanges.txt

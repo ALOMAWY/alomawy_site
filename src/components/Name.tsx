@@ -1,46 +1,66 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const Styled_Name = styled.h3`
-  font-family: "Noto Sans", sans-serif;
-  color: transparent;
-  font-size: 1.5rem;
+  font-family: "Anta", sans-serif;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 900;
   text-transform: uppercase;
-  z-index: 21;
-  overflow: hidden;
-  -webkit-text-stroke: 1px var(--main-color);
-  letter-spacing: 3px;
-  border-right: 1px solid var(--background-white-color);
-  overflow: hidden;
-  white-space: nowrap;
-  font-size: 1rem;
-  direction: ltr;
-  //   animation: typing 5s steps(14) infinite forwards, blink 1s step-end infinite;
+  letter-spacing: 4px;
+  position: relative;
+  width: fit-content;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  
+  &::after {
+    content: '';
+    width: 2px;
+    height: 1em;
+    background: var(--main-color);
+    animation: blink 0.8s infinite;
+    margin-left: 4px;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
 `;
 
 const Name = () => {
-  const [name, setName] = useState<string>("ALOMAWY");
-  const names: string[] = ["Developer", "PUBGER", "Youtuber", "ALOMAWY"];
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+  const words = ["ALOMAWY", "Developer", "Designer", "Creative"];
 
-  setTimeout(() => {
-    const nextName =
-      names.indexOf(name) + 1 < names.length ? names.indexOf(name) + 1 : 0;
+  // Typing effect logic
+  useEffect(() => {
+    if (subIndex === words[index].length + 1 && !reverse) {
+      setTimeout(() => setReverse(true), 2000);
+      return;
+    }
 
-    setName(names[nextName]);
-  }, 5000);
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev: number) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev: number) => prev + (reverse ? -1 : 1));
+    }, Math.max(reverse ? 50 : 150, parseInt(Math.random() * 200 as any)));
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse]);
 
   return (
-    <Link to="/">
-      <div style={{ width: "fit-content", padding: "1rem" }}>
-        <Styled_Name
-          style={{
-            animation: ` typing 5s steps(${
-              name.length * 2
-            }) infinite forwards, blink 1s step-end infinite`,
-          }}
-        >
-          {name}
+    <Link to="/" style={{ textDecoration: 'none' }}>
+      <div style={{ padding: "0.5rem 1rem" }}>
+        <Styled_Name>
+          {words[index].substring(0, subIndex)}
         </Styled_Name>
       </div>
     </Link>

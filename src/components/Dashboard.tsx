@@ -11,134 +11,243 @@ import {
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { addDoc, collection } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { db } from "../lib/firebase";
-import { upload } from "../lib/upload";
 import Portfolio from "./Portfolio";
 import { useMyContext } from "./Context";
 
+const API_URL = 'http://localhost:5000';
+
 const Styled_Form = styled.form`
-  margin: 1rem 0 3rem;
-  flex: 1;
+  margin: 3rem auto;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-  border: 1px dashed var(--main-color);
-  backdrop-filter: blur(10px);
-  background-color: #00000061;
-  box-shadow: 0 0 16px -3px var(--background-main-color);
+  gap: 2rem;
+  padding: 3rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 40px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  color: #fff;
 
-  .input {
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    
+    h2 {
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      opacity: 0.9;
+    }
+
+    .line {
+      width: 60px;
+      height: 4px;
+      background: var(--main-color);
+      margin: 1rem auto;
+      border-radius: 2px;
+      opacity: 0.5;
+    }
+  }
+
+  .grid-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .input-group {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    position: relative;
-    border: 1px solid var(--main-color);
-    border-style: dashed dashed dashed solid;
-    border-radius: 0;
-    overflow: hidden;
-
-    &:has(.techs) .techs,
-    &:has(.types) .types {
-      padding-left: 10px;
-      height: auto;
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      width: 100%;
-
-      > div {
-        white-space: nowrap;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        width: 15%;
-
-        @media (max-width: 1000px) {
-          width: 20%;
-        }
-
-        @media (max-width: 700px) {
-          width: 25%;
-        }
-
-        @media (max-width: 570px) {
-          width: 40%;
-        }
-
-        input {
-          width: fit-content;
-        }
-
-        label {
-          width: fit-content;
-          color: #fff;
-        }
-      }
-    }
-    .arabic,
-    .english {
-      display: flex;
-      width: 30%;
-      margin-left: 15%;
-      gap: 10px;
-
-      input {
-        width: fit-content;
-      }
-
-      label {
-        width: fit-content;
-        color: #fff;
-      }
-    }
-
-    &:has(label + textarea) label {
-      margin-bottom: auto;
-      margin-top: 7px;
-    }
+    flex-direction: column;
+    gap: 0.75rem;
 
     label {
-      width: 20px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.4;
+      margin-left: 1rem;
+    }
+
+    .field {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      transition: all 0.3s ease;
+
+      &:focus-within {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: var(--main-color);
+        box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.2);
+      }
 
       svg {
         color: var(--main-color);
-        margin: 5px;
+        opacity: 0.6;
       }
-    }
 
-    input,
-    textarea {
-      padding: 10px;
-      width: 100%;
-      background: transparent;
-      color: var(--secondary-color);
-      font-weight: normal;
-      text-transform: none;
-      resize: none;
-
-      &::placeholder {
-        color: var(--secondary-color);
-        font-weight: normal;
+      input, textarea, select {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-size: 0.9rem;
+        
+        &::placeholder {
+          opacity: 0.2;
+        }
       }
     }
   }
-  button {
-    padding: 10px;
-    position: relative;
-    border: 1px solid var(--main-color);
-    border-style: dashed dashed dashed solid;
-    border-radius: 0;
-    overflow: hidden;
-    font-weight: normal;
 
-    &:hover {
-      color: var(--main-color);
+  .selection-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    padding: 1.5rem;
+    height: 100%;
+
+    .title {
+      font-size: 0.7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.4;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      svg { color: var(--main-color); }
+    }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+
+      .option {
+        position: relative;
+        
+        label {
+          display: block;
+          padding: 8px 16px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid transparent;
+          border-radius: 12px;
+          font-size: 0.7rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          opacity: 0.4;
+        }
+
+        input {
+          display: none;
+        }
+
+        input:checked + label {
+          background: rgba(var(--main-color-rgb), 0.2);
+          border-color: var(--main-color);
+          opacity: 1;
+          box-shadow: 0 4px 12px rgba(var(--main-color-rgb), 0.1);
+        }
+
+        &:hover label {
+          opacity: 0.8;
+          background: rgba(255, 255, 255, 0.08);
+        }
+      }
+    }
+  }
+
+  .image-upload-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  button[type="submit"] {
+    margin-top: 1rem;
+    padding: 1.5rem;
+    background: var(--main-color);
+    border-radius: 24px;
+    font-weight: 900;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    box-shadow: 0 10px 20px rgba(var(--main-color-rgb), 0.3);
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(var(--main-color-rgb), 0.4);
+      filter: brightness(1.1);
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(1);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    
+    .header h2 {
+      font-size: 1.5rem;
+    }
+
+    .input-group {
+      text-align: center;
+      label {
+        margin-left: 0;
+        justify-content: center;
+        display: flex;
+      }
+    }
+
+    .selection-box {
+      .title {
+        justify-content: center;
+      }
+      .options {
+        justify-content: center;
+      }
+      
+      &.image-upload-container {
+        justify-content: center;
+      }
+    }
+
+    .image-upload-container {
+      justify-content: center;
+    }
+
+    .grid-section {
+      grid-template-columns: 1fr;
     }
   }
 `;
@@ -149,27 +258,10 @@ const Dashboard = () => {
 
   const languages = ["arabic", "english"];
   const technologies = [
-    "html",
-    "css",
-    "javascript",
-    "typescript",
-    "react",
-    "redux",
-    "sass",
-    "bootstrap",
-    "tailwind",
-    "vite",
-    "webpack",
-    "gulp",
-    "eslint",
-    "prettier",
-    "nextjs",
-    "axios",
-    "formik",
-    "yup",
-    "reactRouter",
-    "firebase",
-    "zustand",
+    "html", "css", "javascript", "typescript", "react", "redux", "sass", 
+    "bootstrap", "tailwind", "vite", "webpack", "gulp", "eslint", 
+    "prettier", "nextjs", "axios", "formik", "yup", "reactRouter", 
+    "firebase", "zustand",
   ];
 
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -178,7 +270,7 @@ const Dashboard = () => {
   const [type, setType] = useState("website");
   const [techs, setTechs] = useState<string[]>(["html", "css", "javascript"]);
   const [langs, setLangs] = useState<string[]>(["english"]);
-  const [image, setImage] = useState<{ file: null | File; url: unknown | "" }>({
+  const [image, setImage] = useState<{ file: null | File; url: string }>({
     file: null,
     url: "",
   });
@@ -192,83 +284,89 @@ const Dashboard = () => {
     visit: "",
     disc: "",
     rate: range,
-    image: image.url,
+    image: "",
     langs,
     techs,
     type,
   });
 
-  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadingImage(true);
-      try {
-        const imageURL = await upload(file);
-
-        setImage({
-          file: file,
-          url: imageURL,
-        });
-        setProjectData((prev) => ({ ...prev, image: imageURL }));
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setUploadingImage(false);
-      }
+      setImage({
+        file: file,
+        url: URL.createObjectURL(file),
+      });
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
     if (technologies.includes(name)) {
-      if (e.target.checked) {
-        const newTechs: string[] = [...techs, name];
-        setTechs(newTechs);
+      const checkbox = e.target as HTMLInputElement;
+      if (checkbox.checked) {
+        setTechs((prev) => [...prev, name]);
       } else {
-        const newTechs = techs.filter((e) => e !== name);
-        setTechs(newTechs);
+        setTechs((prev) => prev.filter((el) => el !== name));
       }
     } else if (languages.includes(name)) {
-      if (e.target.checked) {
-        const newLangs: string[] = [...langs, name];
-        setLangs(newLangs);
+      const checkbox = e.target as HTMLInputElement;
+      if (checkbox.checked) {
+        setLangs((prev) => [...prev, name]);
       } else {
-        const newLangs = langs.filter((e) => e !== name);
-        setLangs(newLangs);
+        setLangs((prev) => prev.filter((el) => el !== name));
       }
     } else if (name == "type") {
-      setType(e.target.value);
+      setType(value);
     } else {
       setProjectData((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  useEffect(() => {
     setProjectData((prev) => ({
       ...prev,
       langs,
-      rate: range,
-      image: image.url,
       techs,
       type,
+      rate: range,
+      image: image.url,
     }));
-
-    console.log(projectData);
-  };
+  }, [langs, techs, type, range, image.url]);
 
   const handleRange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRange(e.target.value);
-
-    setProjectData((prev) => ({ ...prev, rate: range }));
   };
 
-  const handleAdd = async (e: React.ChangeEvent<HTMLFormElement>) => {
+  const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData();
+    Object.entries(projectData).forEach(([key, value]) => {
+      if (key === 'langs' || key === 'techs') {
+        formData.append(key, JSON.stringify(value));
+      } else if (key !== 'image') {
+        formData.append(key, value as string);
+      }
+    });
+
+    if (image.file) {
+      formData.append('image', image.file);
+    }
 
     try {
-      await addDoc(collection(db, "projects"), {
-        ...projectData,
+      const response = await fetch(`${API_URL}/api/projects`, {
+        method: 'POST',
+        body: formData,
       });
-      e.target.reset();
+
+      if (!response.ok) throw new Error('Failed to add project');
+
+      (e.target as HTMLFormElement).reset();
       setNewProject((prev) => !prev);
+      handleReset();
     } catch (error) {
       console.error(error);
       setError(true);
@@ -285,471 +383,258 @@ const Dashboard = () => {
   return (
     <div>
       <Styled_Form onSubmit={handleAdd} onReset={handleReset}>
-        <div className="input">
-          <label htmlFor="title">
-            <FontAwesomeIcon icon={faSignature} />
-          </label>
-          <input
-            type="text"
-            placeholder={t("dashboard.projectName")}
-            id="title"
-            name="title"
-            onChange={handleChange}
-            required
-          />
+        <div className="header">
+          <h2>{t("dashboard.add_project") || "Add New Project"}</h2>
+          <div className="line" />
         </div>
-        <div className="input">
-          <label htmlFor="developer">
-            <FontAwesomeIcon icon={faAt} />
-          </label>
-          <input
-            type="text"
-            placeholder={t("dashboard.developerName")}
-            name="developer"
-            id="developer"
-            onChange={handleChange}
-            required
-          />
+
+        <div className="grid-section">
+          <div className="input-group">
+            <label htmlFor="title">{t("dashboard.projectName")}</label>
+            <div className="field">
+              <FontAwesomeIcon icon={faSignature} />
+              <input
+                type="text"
+                placeholder="Project Title"
+                id="title"
+                name="title"
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="developer">{t("dashboard.developerName")}</label>
+            <div className="field">
+              <FontAwesomeIcon icon={faAt} />
+              <input
+                type="text"
+                placeholder="Developer"
+                name="developer"
+                id="developer"
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="source">{t("dashboard.idea_source")}</label>
+            <div className="field">
+              <FontAwesomeIcon icon={faPen} />
+              <input
+                type="text"
+                placeholder="Idea Source"
+                id="source"
+                name="source"
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="visit">{t("dashboard.visit_link")}</label>
+            <div className="field">
+              <FontAwesomeIcon icon={faEye} />
+              <input
+                type="url"
+                placeholder="https://..."
+                id="visit"
+                name="visit"
+                onChange={handleChange}
+              />
+            </div>
+          </div>
         </div>
-        <div className="input">
-          <label htmlFor="source">
-            <FontAwesomeIcon icon={faPen} />
-          </label>
-          <input
-            type="text"
-            placeholder={t("dashboard.idea_source")}
-            id="source"
-            name="source"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="input">
-          <label htmlFor="visit">
-            <FontAwesomeIcon icon={faEye} />
-          </label>
-          <input
-            type="url"
-            placeholder={t("dashboard.visit_link")}
-            id="visit"
-            name="visit"
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input">
-          <label htmlFor="description">
+
+        <div className="input-group">
+          <label htmlFor="description">{t("dashboard.disc")}</label>
+          <div className="field">
             <FontAwesomeIcon icon={faPenToSquare} />
-          </label>
-          <input
-            placeholder={t("dashboard.disc")}
-            id="description"
-            name="disc"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="input">
-          <label htmlFor="type">
-            <FontAwesomeIcon icon={faChessPawn} />
-          </label>
-
-          <div className="types">
-            <div className="type">
-              <label htmlFor="website">{t("portfolio.category.website")}</label>
-              <input
-                type="radio"
-                onChange={handleChange}
-                name="type"
-                id="website"
-                value="website"
-                checked={type == "website"}
-              />
-            </div>
-
-            <div className="type">
-              <label htmlFor="game">{t("portfolio.category.game")}</label>
-              <input
-                type="radio"
-                onChange={handleChange}
-                name="type"
-                id="game"
-                value="game"
-                checked={type == "game"}
-              />
-            </div>
-
-            <div className="type">
-              <label htmlFor="simple">{t("portfolio.category.simple")}</label>
-              <input
-                type="radio"
-                onChange={handleChange}
-                name="type"
-                id="simple"
-                value="simple"
-                checked={type == "simple"}
-              />
-            </div>
-
-            <div className="type">
-              <label htmlFor="dashboard">
-                {t("portfolio.category.dashboard")}
-              </label>
-              <input
-                type="radio"
-                onChange={handleChange}
-                name="type"
-                id="dashboard"
-                value="dashboard"
-                checked={type == "dashboard"}
-              />
-            </div>
-
-            <div className="type">
-              <label htmlFor="app">{t("portfolio.category.app")}</label>
-              <input
-                type="radio"
-                onChange={handleChange}
-                name="type"
-                id="app"
-                value="app"
-                checked={type == "app"}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="input">
-          <label htmlFor="technologies">
-            <FontAwesomeIcon icon={faCode} />
-          </label>
-          <div className="techs">
-            <div className="tech">
-              <label htmlFor="html">HTML</label>
-              <input
-                type="checkbox"
-                name="html"
-                id="html"
-                onChange={handleChange}
-                checked={techs.includes("html")}
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="css">CSS</label>
-              <input
-                type="checkbox"
-                name="css"
-                id="css"
-                onChange={handleChange}
-                checked={techs.includes("css")}
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="javascript">JavaScript</label>
-              <input
-                type="checkbox"
-                name="javascript"
-                id="javascript"
-                onChange={handleChange}
-                checked={techs.includes("javascript")}
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="typescript">TypeScript</label>
-              <input
-                type="checkbox"
-                name="typescript"
-                onChange={handleChange}
-                id="typescript"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="react">React</label>
-              <input
-                type="checkbox"
-                name="react"
-                onChange={handleChange}
-                id="react"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="redux">Redux</label>
-              <input
-                type="checkbox"
-                name="redux"
-                onChange={handleChange}
-                id="redux"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="sass">Sass</label>
-              <input
-                type="checkbox"
-                name="sass"
-                onChange={handleChange}
-                id="sass"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="bootstrap">Bootstrap</label>
-              <input
-                type="checkbox"
-                name="bootstrap"
-                onChange={handleChange}
-                id="bootstrap"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="tailwind">Tailwind CSS</label>
-              <input
-                type="checkbox"
-                name="tailwind"
-                onChange={handleChange}
-                id="tailwind"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="vite">Vite</label>
-              <input
-                type="checkbox"
-                name="vite"
-                onChange={handleChange}
-                id="vite"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="webpack">Webpack</label>
-              <input
-                type="checkbox"
-                name="webpack"
-                onChange={handleChange}
-                id="webpack"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="gulp">Gulp</label>
-              <input
-                type="checkbox"
-                name="gulp"
-                onChange={handleChange}
-                id="gulp"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="eslint">ESLint</label>
-              <input
-                type="checkbox"
-                name="eslint"
-                onChange={handleChange}
-                id="eslint"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="prettier">Prettier</label>
-              <input
-                type="checkbox"
-                name="prettier"
-                onChange={handleChange}
-                id="prettier"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="nextjs">Next.js</label>
-              <input
-                type="checkbox"
-                name="nextjs"
-                onChange={handleChange}
-                id="nextjs"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="axios">Axios</label>
-              <input
-                type="checkbox"
-                name="axios"
-                onChange={handleChange}
-                id="axios"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="formik">Formik</label>
-              <input
-                type="checkbox"
-                name="formik"
-                onChange={handleChange}
-                id="formik"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="yup">Yup</label>
-              <input
-                type="checkbox"
-                name="yup"
-                onChange={handleChange}
-                id="yup"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="reactRouter">React Router</label>
-              <input
-                type="checkbox"
-                name="reactRouter"
-                onChange={handleChange}
-                id="reactRouter"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="firebase">Firebase</label>
-              <input
-                type="checkbox"
-                name="firebase"
-                onChange={handleChange}
-                id="firebase"
-              />
-            </div>
-            <div className="tech">
-              <label htmlFor="zustand">Zustand</label>
-              <input
-                type="checkbox"
-                name="zustand"
-                onChange={handleChange}
-                id="zustand"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="input">
-          <label htmlFor="language">
-            <FontAwesomeIcon icon={faLanguage} />
-          </label>
-
-          <div className="arabic">
-            <label htmlFor="arabic">Arabic</label>
-            <input
-              type="checkbox"
-              name="arabic"
+            <textarea
+              placeholder="Tell us about the project..."
+              id="description"
+              name="disc"
               onChange={handleChange}
-              id="arabic"
-            />
-          </div>
-          <div className="english">
-            <label htmlFor="english">English</label>
-            <input
-              type="checkbox"
-              name="english"
-              onChange={handleChange}
-              id="english"
-              checked={langs.includes("english")}
+              required
+              rows={4}
             />
           </div>
         </div>
-        <div className="input">
-          <label htmlFor="rate">
-            <FontAwesomeIcon icon={faStar} />
-          </label>
-          <input
-            type="range"
-            name="range"
-            placeholder={t("dashboard.rate")}
-            id="rate"
-            style={{ opacity: "0", height: "50px" }}
-            onChange={handleRange}
-            value={"20"}
-          />
-          <div
-            style={{
-              width: "80%",
-              height: "10px",
-              left: "10%",
-              backgroundColor: "white",
-              position: "absolute",
-              zIndex: "-1",
-            }}
-          >
-            <div
-              style={{
-                width: range + "%",
-                height: "100%",
-                background:
-                  +range > 80
-                    ? "green"
-                    : +range > 60
-                    ? "yellow"
-                    : +range > 40
-                    ? "blue"
-                    : +range > 20
-                    ? "red"
-                    : "orange",
-              }}
-            ></div>
+
+        <div className="grid-section">
+          <div className="selection-box">
+            <div className="title">
+              <FontAwesomeIcon icon={faChessPawn} />
+              {t("portfolio.type") || "Project Category"}
+            </div>
+            <div className="options">
+              {["website", "game", "simple", "dashboard", "app"].map((val) => (
+                <div key={val} className="option">
+                  <input
+                    type="radio"
+                    onChange={handleChange}
+                    name="type"
+                    id={val}
+                    value={val}
+                    checked={type == val}
+                  />
+                  <label htmlFor={val}>{t(`portfolio.category.${val}`)}</label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="selection-box">
+            <div className="title">
+              <FontAwesomeIcon icon={faCode} />
+              {t("portfolio.techs") || "Technologies Used"}
+            </div>
+            <div className="options">
+              {technologies.map((tech) => (
+                <div key={tech} className="option">
+                  <input
+                    type="checkbox"
+                    name={tech}
+                    id={tech}
+                    onChange={handleChange}
+                    checked={techs.includes(tech)}
+                  />
+                  <label htmlFor={tech}>{tech.toUpperCase()}</label>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="input">
-          <label
-            htmlFor="image"
-            style={{
-              display: "flex",
-              width: "100%",
-              alignItems: "center",
-              gap: "1rem",
-            }}
-          >
+
+        <div className="grid-section">
+          <div className="selection-box">
+            <div className="title">
+              <FontAwesomeIcon icon={faLanguage} />
+              {t("portfolio.langs") || "Languages"}
+            </div>
+            <div className="options">
+              <div className="option">
+                <input
+                  type="checkbox"
+                  name="arabic"
+                  onChange={handleChange}
+                  id="arabic"
+                  checked={langs.includes("arabic")}
+                />
+                <label htmlFor="arabic">Arabic</label>
+              </div>
+              <div className="option">
+                <input
+                  type="checkbox"
+                  name="english"
+                  onChange={handleChange}
+                  id="english"
+                  checked={langs.includes("english")}
+                />
+                <label htmlFor="english">English</label>
+              </div>
+            </div>
+          </div>
+
+          <div className="selection-box">
+            <div className="title">
+              <FontAwesomeIcon icon={faStar} />
+              {t("dashboard.rate")}
+            </div>
+            <div style={{ position: 'relative', marginTop: '1rem' }}>
+              <input
+                type="range"
+                name="range"
+                id="rate"
+                style={{ opacity: "0", height: "40px", width: '100%', cursor: 'pointer', zIndex: 2, position: 'relative' }}
+                onChange={handleRange}
+                value={range}
+              />
+              <div
+                style={{
+                  width: "100%",
+                  height: "8px",
+                  top: "16px",
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                  position: "absolute",
+                  borderRadius: '4px',
+                  overflow: 'hidden'
+                }}
+              >
+                <div
+                  style={{
+                    width: range + "%",
+                    height: "100%",
+                    background: `linear-gradient(to right, ${+range > 80 ? '#2ecc71' : +range > 40 ? '#3498db' : '#e67e22'}, var(--main-color))`,
+                    boxShadow: `0 0 10px ${+range > 40 ? 'rgba(52, 152, 219, 0.4)' : 'rgba(230, 126, 34, 0.4)'}`
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="selection-box">
+          <div className="title">
             <FontAwesomeIcon icon={faImage} />
-            <span
+            {t("dashboard.projectImage") || "Project Image"}
+          </div>
+          <div className="image-upload-container">
+            <label
+              htmlFor="image"
               style={{
-                color: "var(--main-color)",
-                width: "fit-content",
-                textDecoration: !uploadingImage ? "underline" : "none",
+                display: "flex",
+                flexDirection: 'column',
+                alignItems: "center",
+                gap: "1rem",
+                cursor: 'pointer',
+                padding: '2rem',
+                border: '2px dashed rgba(255,255,255,0.1)',
+                borderRadius: '24px',
+                width: '240px'
               }}
             >
-              {uploadingImage
-                ? t("dashboard.uploadingImage")
-                : image.url
-                ? t("dashboard.change_image_here")
-                : t("dashboard.select_image_here")}
-            </span>
-          </label>
-          <img
-            src={(image.url as string) || "./assets/project-placeholder.png"}
-            alt="Image"
-            style={{
-              width: "200px",
-              height: "100px",
-              opacity: image.url ? "1" : "0.5",
-            }}
-          />
+              <FontAwesomeIcon icon={faImage} size="2x" />
+              <span style={{ color: "var(--main-color)", fontWeight: 900, fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                {uploadingImage ? t("dashboard.uploading") : t("dashboard.select_image")}
+              </span>
+            </label>
+            
+            {(image.url || projectData.image) && (
+              <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', width: '320px', height: '180px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <img
+                  src={image.url || projectData.image || "./assets/project-placeholder.png"}
+                  alt="Preview"
+                  style={{ width: "100%", height: "100%", objectFit: 'cover' }}
+                />
+              </div>
+            )}
+          </div>
           <input
             style={{ display: "none" }}
             type="file"
-            placeholder="Image URL"
             name="image"
             id="image"
-            required
             onChange={handleImage}
             disabled={uploadingImage}
           />
         </div>
 
-        {error && <div className="err-input">Check To All Inputs Fields</div>}
+        {error && <div style={{ color: '#e74c3c', textAlign: 'center', fontWeight: 'bold' }}>Please check all fields.</div>}
+        
         <button type="submit" disabled={loading || uploadingImage}>
-          {uploadingImage
-            ? t("dashboard.uploadingImage")
-            : loading
-            ? t("info.loading") + "..."
-            : t("dashboard.add")}
+          {uploadingImage ? t("dashboard.uploadingImage") : loading ? t("info.loading") : t("dashboard.add")}
         </button>
       </Styled_Form>
-      <>
-        <h1
-          style={{
-            color: "#fff",
-            textAlign: "center",
-            margin: "2rem",
-            textTransform: "uppercase",
-          }}
-        >
-          Projects
-        </h1>
-        <Portfolio />
-      </>
+
+      <section style={{marginTop: '8rem', marginBottom: '8rem'}}>
+        <div className="site-container">
+          <Portfolio />
+        </div>
+      </section>
     </div>
   );
 };

@@ -10,9 +10,9 @@ import Services from "./components/Services";
 import styled from "styled-components";
 import Paths from "./components/MyPath";
 import { getItemFromLocalStorage } from "./utils/localStorage";
-import Contact_Us from "./components/Contact_Us";
+import ContactUs from "./components/ContactUs";
 import Socials from "./components/Socials";
-import About_Us from "./components/About_Us";
+import AboutUs from "./components/AboutUs";
 import Dashboard from "./components/Dashboard";
 import { useSelector } from "react-redux";
 import { handleSetTheme } from "./utils";
@@ -115,7 +115,7 @@ function App() {
               path="/contact_us"
               element={
                 <Holder>
-                  <Contact_Us />
+                  <ContactUs />
                 </Holder>
               }
             />
@@ -123,7 +123,7 @@ function App() {
               path="/about_us"
               element={
                 <Holder>
-                  <About_Us />
+                  <AboutUs />
                 </Holder>
               }
             />

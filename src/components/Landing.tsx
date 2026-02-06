@@ -90,7 +90,7 @@ const TextArea = styled.section`
     max-width: 100%;
   }
 
-  .discripton {
+  .description {
     width: 100%;
     position: relative;
     margin: 1rem 0;
@@ -221,17 +221,17 @@ const Landing = () => {
   return (
     <LandingContainer>
       <TextArea>
-        <div className="discripton">
+        <div className="description">
           <h2 className="sey-hello">{t("info.welcome")}</h2>
           <p>
-            {t("info.discription.name")}
+            {t("info.description.name")}
             <br />
-            {t("info.discription.work")}
+            {t("info.description.work")}
             <br />
-            {t("info.discription.from")}
+            {t("info.description.from")}
             <br />
-            {t("info.discription.website")}
-            <br /> {t("info.discription.technoloji")}
+            {t("info.description.website")}
+            <br /> {t("info.description.technology")}
           </p>
         </div>
 

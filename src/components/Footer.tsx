@@ -254,8 +254,8 @@ const Footer = () => {
               <FontAwesomeIcon icon={faLocationDot} />
             </span>
             <p>
-              <span>sinanbey.JAD</span>
-              <strong>Bursa ,Türkiye</strong>
+              <span>{t("footer.address_title")}</span>
+              <strong>{t("footer.city")}</strong>
             </p>
           </div>
           <div className="item">
@@ -276,11 +276,8 @@ const Footer = () => {
           <div className="image">
             <img src="./logos/newLogo.webp" alt="" />
           </div>
-          <h1>About My Website</h1>
-          <p>
-            This is a simple personal website built with React. It is a place
-            where I share my thoughts and ideas.
-          </p>
+          <h1>{t("footer.about_title")}</h1>
+          <p>{t("footer.about_desc")}</p>
 
           <ul className="socials">
             <li>
@@ -339,7 +336,7 @@ const Footer = () => {
         </ul>
       </div>
       <div className="copyright">
-        <p>&copy; {new Date().getFullYear()} ALOMAWY. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} ALOMAWY. {t("footer.rights")}</p>
       </div>
     </Styled_Footer>
   );

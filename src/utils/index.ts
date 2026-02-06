@@ -46,15 +46,19 @@ export const handleSetTheme = (color: string, change?: boolean): void => {
 
   switch (nextColor) {
     case "red":
-      themeFile.innerHTML = `:root {--main-color: #ff0000;
---secondary-color: #e7c3c3; 
---background-main-color: #ff000038;
---background-white-color: #e7c3c37e; 
---background-color: #000f18;}`;
+      themeFile.innerHTML = `:root {
+  --main-color: #ff0000;
+  --main-color-rgb: 255, 0, 0;
+  --secondary-color: #e7c3c3; 
+  --background-main-color: #ff000038;
+  --background-white-color: #e7c3c37e; 
+  --background-color: #000f18;
+}`;
       break;
     case "blue":
       themeFile.innerHTML = `:root {
   --main-color: #186ca4;
+  --main-color-rgb: 24, 108, 164;
   --secondary-color: #fff;
   --background-main-color: rgba(30, 56, 103, 0.7);
   --background-white-color: rgba(255, 255, 255, 0.7);
@@ -65,6 +69,7 @@ export const handleSetTheme = (color: string, change?: boolean): void => {
     case "green":
       themeFile.innerHTML = `:root {
   --main-color: #4caf50;
+  --main-color-rgb: 76, 175, 80;
   --secondary-color: #b8f0ba;
   --background-main-color: #4caf505c;
   --background-white-color: #ffffff99;
@@ -75,6 +80,7 @@ export const handleSetTheme = (color: string, change?: boolean): void => {
     case "orange":
       themeFile.innerHTML = `:root {
   --main-color: #ff9800;
+  --main-color-rgb: 255, 152, 0;
   --secondary-color: #ffe2b6;
   --background-main-color: #ff980040;
   --background-white-color: #b7a488;
@@ -85,6 +91,7 @@ export const handleSetTheme = (color: string, change?: boolean): void => {
     case "purple":
       themeFile.innerHTML = `:root {
   --main-color: #9c27b0;
+  --main-color-rgb: 156, 39, 176;
   --secondary-color: #ba95c0;
   --background-main-color: #9c27b05c;
   --background-white-color: #d4abdb94;
