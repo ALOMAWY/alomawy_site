@@ -1,6 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import Project from '../models/Project.js';
 
 const router = express.Router();
@@ -8,7 +9,10 @@ const router = express.Router();
 // Configure Multer for image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const uploadPath = path.resolve(__dirname, '../uploads');
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
