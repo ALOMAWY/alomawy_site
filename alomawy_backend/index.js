@@ -18,6 +18,12 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Ensure connection before handling requests
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
 // Serving uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -41,11 +47,7 @@ const connectDB = async () => {
   }
 }
 
-// Ensure connection before handling requests (middleware approach)
-app.use(async (req, res, next) => {
-  await connectDB();
-  next();
-});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
