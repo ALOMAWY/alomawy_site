@@ -415,7 +415,14 @@ const Card = ({ project }: any) => {
       <div className="infos">
         <div className="info">
           <span className="label text-color-main">{t("portfolio.developer")}</span>
-          <span className="value">{developer}</span>
+          <span className="value">
+            {developer}
+            {["ALOMAWY", "alomawy", "Abdalrahman ALDABBAS"].includes(developer) && (
+              <span style={{ fontSize: "0.7em", color: "var(--main-color)", marginLeft: "5px", fontFamily: "cursive" }}>
+                (Me)
+              </span>
+            )}
+          </span>
         </div>
 
         <div className="info">
