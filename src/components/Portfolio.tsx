@@ -5,7 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useMyContext } from "./Context";
 
-const API_URL = 'http://localhost:5000';
+// const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = "https://alomawy-site.vercel.app";
 
 const Styled_Portfolio = styled.div`
   display: grid;
