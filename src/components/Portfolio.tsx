@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { faStar, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useMyContext } from "./Context";
 
 // const API_URL = import.meta.env.VITE_API_URL;
@@ -143,11 +143,86 @@ const PortfolioSection = styled.div`
   padding-bottom: 50px;
 `;
 
+const LoaderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  width: 100%;
+  gap: 4rem;
+  color: #fff;
+  padding: 2rem;
+
+  .square-loader {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    width: 120px;
+    height: 120px;
+    transform: rotate(45deg);
+
+    @media (max-width: 768px) {
+      width: 80px;
+      height: 80px;
+    }
+
+    div {
+      width: 100%;
+      height: 100%;
+      background: rgba(var(--main-color-rgb), 0.15);
+      border: 2px solid rgba(var(--main-color-rgb), 0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(var(--main-color-rgb), 0.2);
+      animation: square-anim 1.5s infinite ease-in-out;
+
+      &:nth-child(1) { animation-delay: 0s; }
+      &:nth-child(2) { animation-delay: 0.2s; }
+      &:nth-child(3) { animation-delay: 0.4s; }
+      &:nth-child(4) { animation-delay: 0.6s; }
+    }
+  }
+
+  @keyframes square-anim {
+    0%, 100% {
+      transform: scale(1);
+      background: rgba(var(--main-color-rgb), 0.15);
+      border-color: rgba(var(--main-color-rgb), 0.4);
+    }
+    50% {
+      transform: scale(1.2);
+      background: var(--main-color);
+      border-color: var(--main-color);
+      box-shadow: 0 0 30px var(--main-color);
+    }
+  }
+
+  p {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    background: linear-gradient(135deg, #fff 30%, var(--main-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    margin-top: 1rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.2rem;
+      letter-spacing: 4px;
+    }
+  }
+`;
+
 const Portfolio = () => {
   const { newProject } = useMyContext();
   const { t } = useTranslation();
 
   const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [category, setCategory] = useState<string>("all");
   const categoriesList = [
@@ -168,6 +243,7 @@ const Portfolio = () => {
   }, [category, projects]);
 
   const handleFetchingData = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/projects`);
       if (!response.ok) throw new Error('Failed to fetch projects');
@@ -175,6 +251,9 @@ const Portfolio = () => {
       setProjects(data);
     } catch (error) {
       console.error('Error fetching data from MongoDB:', error);
+    } finally {
+      // Small timeout to ensure transition is smooth and not too jarring
+      setTimeout(() => setLoading(false), 500);
     }
   };
 
@@ -198,15 +277,30 @@ const Portfolio = () => {
           {filteredProjects.length < 10 ? `0${filteredProjects.length}` : filteredProjects.length}
         </CategoryItem>
       </Categories>
-      <Styled_Portfolio>
-        {filteredProjects.map((project) => (
-          <Card key={project._id} project={project} />
-        ))}
-      </Styled_Portfolio>
-      {!filteredProjects.length && (
-        <NoItemsMessage>
-          {t("portfolio.no_projects")}
-        </NoItemsMessage>
+
+      {loading ? (
+        <LoaderContainer>
+          <div className="square-loader">
+            <div />
+            <div />
+            <div />
+            <div />
+          </div>
+          <p>{t("info.loading")}</p>
+        </LoaderContainer>
+      ) : (
+        <>
+          <Styled_Portfolio>
+            {filteredProjects.map((project) => (
+              <Card key={project._id} project={project} />
+            ))}
+          </Styled_Portfolio>
+          {!filteredProjects.length && (
+            <NoItemsMessage>
+              {t("portfolio.no_projects")}
+            </NoItemsMessage>
+          )}
+        </>
       )}
     </PortfolioSection>
   );

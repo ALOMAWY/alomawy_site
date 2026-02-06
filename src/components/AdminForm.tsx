@@ -1,9 +1,9 @@
 import { faKey, faUserTie, faCheckCircle, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { signRejected, signResolved } from "../redux/adminSign";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 const fadeIn = keyframes`
@@ -32,7 +32,7 @@ const StyledForm = styled.form<{ $error?: boolean }>`
   border-radius: 20px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   animation: ${fadeIn} 0.6s ease-out;
-  ${props => props.$error && `animation: ${shake} 0.3s ease-in-out;`}
+  ${props => props.$error && css`animation: ${shake} 0.3s ease-in-out;`}
   transition: all 0.3s ease;
 
   h1 {
@@ -135,46 +135,107 @@ const StyledForm = styled.form<{ $error?: boolean }>`
   }
 `;
 
-const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+import { getItemFromLocalStorage, setItemInLocalStorage, removeItemInLocalStorage } from "../utils/localStorage";
 
 const AdminForm = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
+  const [lockoutTime, setLockoutTime] = useState<number | null>(null);
+  const [remainingMinutes, setRemainingMinutes] = useState<number>(0);
   const dispatch = useDispatch();
+
+  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+  const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+
+  // Check lockout on mount and every 10 seconds
+  useEffect(() => {
+    console.log("AdminForm: Mounting, checking initial lockout status...");
+    const checkLockout = () => {
+      const lockoutUntil = Number(getItemFromLocalStorage("lockout_until", 0));
+      if (lockoutUntil && lockoutUntil > Date.now()) {
+        const remaining = Math.ceil((lockoutUntil - Date.now()) / 60000);
+        console.log(`AdminForm: System is locked for ${remaining} more minutes.`);
+        setLockoutTime(lockoutUntil);
+        setRemainingMinutes(remaining);
+      } else {
+        if (lockoutTime) {
+          console.log("AdminForm: Lockout expired, enabling form.");
+          setLockoutTime(null);
+          removeItemInLocalStorage("lockout_until");
+          removeItemInLocalStorage("login_attempts");
+        }
+      }
+    };
+
+    checkLockout();
+    const interval = setInterval(checkLockout, 10000);
+    return () => clearInterval(interval);
+  }, [lockoutTime]);
 
   const handleSign = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("AdminForm: Login attempt started.");
+
+    if (lockoutTime) {
+      console.warn("AdminForm: Attempt blocked due to active lockout.");
+      return;
+    }
+
     setError(false);
     const formData = new FormData(e.target as HTMLFormElement);
     const { email, password } = Object.fromEntries(formData);
+
+    console.log("AdminForm: Comparing credentials...");
+    if (!adminEmail || !adminPassword) {
+      console.error("AdminForm: Environment variables (Email/Password) are missing! Check .env file.");
+    }
 
     setLoading(true);
 
     // Smooth simulated check for a better feel
     setTimeout(() => {
       if (email === adminEmail && password === adminPassword) {
+        console.log("AdminForm: Credentials correct. Logging in...");
         setSuccess(true);
         setLoading(false);
-        // Duration after pressing login to make it smooth before transition
+        removeItemInLocalStorage("login_attempts");
+        removeItemInLocalStorage("lockout_until");
         setTimeout(() => {
           dispatch(signResolved());
         }, 1000);
       } else {
+        const attempts = Number(getItemFromLocalStorage("login_attempts", 0)) + 1;
+        console.log(`AdminForm: Credentials incorrect. Attempt #${attempts}`);
+        setItemInLocalStorage("login_attempts", attempts);
+
+        if (attempts >= 7) {
+          const until = Date.now() + 15 * 60 * 1000;
+          console.log("AdminForm: Lockout threshold reached. Locking for 15 minutes.");
+          setItemInLocalStorage("lockout_until", until);
+          setLockoutTime(until);
+          setRemainingMinutes(15);
+        }
+
         setError(true);
         setLoading(false);
         dispatch(signRejected());
-        // Auto clear error shake after animation
-        setTimeout(() => setError(false), 500);
       }
     }, 1200);
   };
 
+  const handleInputChange = () => {
+    if (error) {
+      console.log("AdminForm: User is typing, clearing error state.");
+      setError(false);
+    }
+  };
+
   return (
     <StyledForm onSubmit={handleSign} $error={error}>
-      <h1>{t("admin.ask")}</h1>
+      <h1>{lockoutTime ? t("admin.locked_title") : t("admin.ask")}</h1>
+      
       <div className="input">
         <label htmlFor="email">
           <FontAwesomeIcon icon={faUserTie} />
@@ -185,6 +246,8 @@ const AdminForm = () => {
           id="email"
           name="email"
           autoComplete="email"
+          disabled={loading || success || !!lockoutTime}
+          onChange={handleInputChange}
           required
         />
       </div>
@@ -198,15 +261,23 @@ const AdminForm = () => {
           placeholder={t("admin.placeholder.pass")}
           id="adminPass"
           autoComplete="current-password"
+          disabled={loading || success || !!lockoutTime}
+          onChange={handleInputChange}
           required
         />
       </div>
       
-      <div className="error-msg">
-        {error && "Invalid credentials. Please try again."}
+      <div className="error-msg" style={{ minHeight: "1.5rem" }}>
+        {lockoutTime ? (
+          <span style={{ color: "var(--main-color)", fontWeight: "bold" }}>
+            {t("admin.locked_msg", { minutes: remainingMinutes })}
+          </span>
+        ) : (
+          error && t("admin.error")
+        )}
       </div>
 
-      <button type="submit" disabled={loading || success}>
+      <button type="submit" disabled={loading || success || !!lockoutTime}>
         {success ? (
           <>
             <FontAwesomeIcon icon={faCheckCircle} />
@@ -216,6 +287,11 @@ const AdminForm = () => {
           <>
             <FontAwesomeIcon icon={faSpinner} spin />
             {t("info.loading")}
+          </>
+        ) : lockoutTime ? (
+          <>
+            <FontAwesomeIcon icon={faSpinner} spin />
+            {t("admin.wait")}
           </>
         ) : (
           t("admin.sign")

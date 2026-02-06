@@ -146,7 +146,11 @@
       "pass": "Password :"
     },
     "sign": "Sign, Im Admin",
-    "ask": "Are You Admin ? "
+    "ask": "Are You Admin ? ",
+    "error": "There was an error in the provided information.",
+    "locked_title": "Access Locked",
+    "locked_msg": "Too many failed attempts. Please try again in {{minutes}} minutes.",
+    "wait": "System Locked"
   },
   "portfolio": {
     "developer": "Developer :",
@@ -170,8 +174,12 @@
     }
   },
   "footer": {
-    "address_title": "Sinanbey.JAD",
-    "city": "Bursa, Türkiye",
+    "address_title": "Syria Damascus",
+    "city": "Darraya",
+    "phone": "+963 0952 437 717 Syria",
+    "phone_label": "Phone",
+    "address_label": "Address",
+    "email_label": "Email",
     "about_title": "About My Website",
     "about_desc": "This is a simple personal website built with React. It is a place where I share my thoughts and ideas.",
     "rights": "All rights reserved."

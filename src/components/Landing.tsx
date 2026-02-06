@@ -1,273 +1,245 @@
-import styled from "styled-components";
-
+import styled, { keyframes, css } from "styled-components";
 import { useTranslation } from "react-i18next";
+
+const float = keyframes`
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.02); }
+`;
+
+const glow = keyframes`
+  0%, 100% { box-shadow: 0 0 30px 10px rgba(var(--main-color-rgb), 0.3); }
+  50% { box-shadow: 0 0 60px 20px rgba(var(--main-color-rgb), 0.5); }
+`;
 
 const LandingContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  height: 100%;
+  min-height: 80vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
 
   @media (max-width: 991px) {
     flex-direction: column-reverse;
-    margin: 3rem 1rem;
+    padding: 1rem;
+    gap: 3rem;
+  }
+`;
+
+const HeroSection = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  gap: 4rem;
+  z-index: 2;
+
+  @media (max-width: 991px) {
+    flex-direction: column-reverse;
+    text-align: center;
     gap: 2rem;
   }
 `;
 
-const LogoSection = styled.div`
+const TextArea = styled.section`
+  flex: 1.2;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
+  gap: 2rem;
+
+  .welcome-badge {
+    background: rgba(var(--main-color-rgb), 0.15);
+    color: var(--main-color);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 1px solid rgba(var(--main-color-rgb), 0.3);
+    backdrop-filter: blur(10px);
+
+    @media (max-width: 991px) {
+      margin: 0 auto;
+    }
+  }
+
+  h1.main-title {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    color: #fff;
+    margin: 0;
+    font-weight: 800;
+    
+    span {
+      display: block;
+      background: linear-gradient(135deg, #fff 30%, var(--main-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @media (max-width: 991px) {
+      font-size: 2.5rem;
+    }
+  }
+
+  p.description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 600px;
+    margin: 0;
+
+    @media (max-width: 991px) {
+      margin: 0 auto;
+    }
+  }
+
+  .skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 1rem;
+
+    @media (max-width: 991px) {
+      justify-content: center;
+    }
+
+    .skill-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 20px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: default;
+      backdrop-filter: blur(5px);
+
+      &:hover {
+        background: var(--main-color);
+        color: #000;
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 10px 20px rgba(var(--main-color-rgb), 0.3);
+        border-color: var(--main-color);
+      }
+    }
+  }
+`;
+
+const VisualSection = styled.div`
+  flex: 0.8;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 75px;
+  position: relative;
 
-  @media (max-width: 991px) {
-    gap: 2.5rem;
-  }
-
-  @media (min-width: 992px) {
-    margin-right: 2rem;
+  &::before {
+    content: "";
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(circle, rgba(var(--main-color-rgb), 0.15) 0%, transparent 70%);
+    z-index: -1;
   }
 `;
 
-const Name = styled.h1`
-  width: 100%;
-  padding: 10px 20px;
-  margin: 0 1rem;
-  border: 1px solid var(--main-color);
-  text-align: center;
-  font-size: 1.7rem;
-  background-image: linear-gradient(
-    to left,
-    var(--secondary-color),
-    var(--main-color)
-  );
-  border-radius: 16px 0 16px 0;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: rotating-color linear infinite 5s;
-  background-size: 500%;
-  background-color: var(--background-main-color);
-  backdrop-filter: blur(6px);
-`;
-
-const ImageLogo = styled.div`
-  width: 20vw;
-  height: 20vw;
-  border-radius: 50%;
-  box-shadow: 0 0 40px 18px var(--main-color);
-  animation: changeHue 10s infinite linear;
-  outline: 3px solid var(--main-color);
-  outline-offset: 15px;
+const ImageContainer = styled.div`
+  width: 25vw;
+  height: 25vw;
+  max-width: 400px;
+  max-height: 400px;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(var(--main-color-rgb), 0.3);
+  backdrop-filter: blur(20px);
+  position: relative;
   overflow: hidden;
+  animation: ${float} 6s ease-in-out infinite, ${glow} 4s ease-in-out infinite;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
-  &:hover img {
-    transform: scale(1.15) rotate(10deg);
-  }
-
-  @media (max-width: 991px) {
-    width: 50vw;
-    height: 50vw;
+  &:hover {
+    border-radius: 50%;
+    border-color: var(--main-color);
+    transform: scale(1.05);
   }
 
   img {
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 20px rgba(var(--main-color-rgb), 0.2));
+  }
+
+  @media (max-width: 991px) {
+    width: 60vw;
+    height: 60vw;
   }
 `;
 
-const TextArea = styled.section`
-  display: flex;
-  flex-direction: column;
-  max-width: 50%;
-  justify-content: space-evenly;
-  min-height: 100%;
-  position: relative;
-  color: var(--secondary-color);
-
-  @media (max-width: 991px) {
-    min-width: 50%%;
-    max-width: 100%;
-  }
-
-  .description {
-    width: 100%;
-    position: relative;
-    margin: 1rem 0;
-
-    @media (max-width: 991px) {
-      padding: 10px 0;
-    }
-
-    &:hover::before {
-      width: 100%;
-      border: 5px solid var(--main-color);
-    }
-
-    h2.sey-hello {
-      color: var(--secondary-color);
-      font-size: 1.3rem;
-      background-color: var(--background-main-color);
-      padding: 10px 20px;
-      border-radius: 0;
-      margin-bottom: 1.5rem;
-      text-transform: uppercase;
-      width: fit-content;
-
-      @media (max-width: 991px) {
-        text-align: center;
-        width: 100%;
-      }
-    }
-
-    & p {
-      letter-spacing: 3px;
-      line-height: 2;
-      word-spacing: 2px;
-      color: var(--secondary-color);
-      position: relative;
-      margin-top: 10px;
-      border-radius: 0;
-      width: fit-content;
-      font-size: 0.9rem;
-      word-wrap: break-word;
-      text-align: start;
-      width: 100%;
-
-      @media (max-width: 991px) {
-        text-align: center;
-        line-height: 2;
-        font-size: 1rem;
-      }
-    }
-
-    &:hover {
-      text-shadow: 3px 3px 10px var(--main-color);
-    }
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      height: 100%;
-      width: 0%;
-      transform: translate(-50%, -50%);
-      background-color: var(--background-main-color);
-      opacity: 0.2;
-      transition: 0.3s;
-    }
-  }
-
-  ul#my-skills {
-    position: relative;
-    width: 75%;
-    z-index: 2;
-
-    li {
-      padding: 10px;
-      display: block;
-      width: 100%;
-      position: relative;
-      background-color: var(--background-main-color);
-      margin: 5px 0 5px 0;
-      border-radius: 20px 2px 20px 2px / 30px 2px 30px 2px;
-      transition: 0.3s;
-      color: white;
-      overflow: hidden;
-      letter-spacing: 4px;
-      border-top: 4px solid transparent;
-
-      &:hover {
-        border-top: 4px solid var(--background-main-color);
-        color: var(--main-color);
-        z-index: 3;
-        letter-spacing: 6px;
-      }
-
-      &::before {
-        content: "";
-        background-color: var(--background-white-color);
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        box-shadow: 0 0 2px 0px var(--main-color) inset;
-        top: 0px;
-        left: -120%;
-        transition: 0.2s;
-        z-index: -2;
-      }
-
-      &:hover::before {
-        left: 0px;
-      }
-
-      @media (max-width: 991px) {
-        text-align: center;
-      }
-    }
-
-    @media (max-width: 991px) {
-      max-width: 100%;
-      min-width: 100%;
-}
-  
+const BackgroundElement = styled.div<{ $top: string; $left: string; $size: string; $delay: string }>`
+  position: absolute;
+  top: ${props => props.$top};
+  left: ${props => props.$left};
+  width: ${props => props.$size};
+  height: ${props => props.$size};
+  background: radial-gradient(circle, rgba(var(--main-color-rgb), 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 1;
+  filter: blur(40px);
+  animation: ${float} 8s ease-in-out infinite;
+  animation-delay: ${props => props.$delay};
 `;
 
 const Landing = () => {
   const { t } = useTranslation();
 
-  const numbers = Object.keys(t("info.numbers", { returnObjects: true }));
+  const skills: string[] = [
+    "HTML", "CSS", "JavaScript", "ReactJS", "NextJs", "TypeScript", "Sass", "GITHUB", "Tailwind"
+  ];
+
   return (
     <LandingContainer>
-      <TextArea>
-        <div className="description">
-          <h2 className="sey-hello">{t("info.welcome")}</h2>
-          <p>
-            {t("info.description.name")}
-            <br />
+      <BackgroundElement $top="10%" $left="5%" $size="300px" $delay="0s" />
+      <BackgroundElement $top="60%" $left="80%" $size="400px" $delay="-2s" />
+      
+      <HeroSection>
+        <TextArea>
+          <div className="welcome-badge">{t("info.welcome")}</div>
+          <h1 className="main-title">
+            <span>{t("info.fullname")}</span>
             {t("info.description.work")}
-            <br />
+          </h1>
+          <p className="description">
             {t("info.description.from")}
             <br />
             {t("info.description.website")}
-            <br /> {t("info.description.technology")}
+            <br />
+            {t("info.description.technology")}
           </p>
-        </div>
+          
+          <div className="skills-grid">
+            {skills.map(skill => (
+              <span key={skill} className="skill-chip">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </TextArea>
 
-        <ul id="my-skills" className="skills l-change dir-lang-ar">
-          <li id="my-skill-1" className="my-skill">
-            {numbers[1]}- HTML
-          </li>
-          <li id="my-skill-2" className="my-skill">
-            {numbers[2]}- CSS
-          </li>
-          <li id="my-skill-3" className="my-skill">
-            {numbers[3]}- JavaScript
-          </li>
-          <li id="my-skill-4" className="my-skill">
-            {numbers[4]}- GITHUB
-          </li>
-          <li id="my-skill-6" className="my-skill">
-            {numbers[5]}- TypeScript
-          </li>
-          <li id="my-skill-6" className="my-skill">
-            {numbers[6]}- Sass
-          </li>
-          <li id="my-skill-6" className="my-skill">
-            {numbers[7]}- ReactJs
-          </li>
-          <li id="my-skill-6" className="my-skill">
-            {numbers[8]}- NextJs
-          </li>
-        </ul>
-      </TextArea>
-      <LogoSection>
-        <Name>{t("info.fullname")}</Name>
-        <ImageLogo>
-          <img src="./logos/newLogo.webp" alt="main-logo" />
-        </ImageLogo>
-      </LogoSection>
+        <VisualSection>
+          <ImageContainer>
+            <img src="./logos/newLogo.webp" alt="Alomawy Logo" />
+          </ImageContainer>
+        </VisualSection>
+      </HeroSection>
     </LandingContainer>
   );
 };

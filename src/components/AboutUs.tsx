@@ -19,60 +19,105 @@ const StyledAboutUs = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 1.5rem;
+  gap: 2rem;
 
-  @media (max-width: 800px) {
+  @media (max-width: 900px) {
     flex-direction: column;
+    padding: 1rem;
   }
 
   .info-box {
-    flex: 1;
+    flex: 1.5;
     background: rgba(255, 255, 255, 0.03);
-    max-width: 50%;
-    border-radius: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(12px);
-    padding: 1rem;
-    transition: 0.3s;
+    max-width: 65%;
+    border-radius: 35px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(15px);
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.05);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+      border-color: rgba(var(--main-color-rgb), 0.3);
+      transform: translateY(-5px);
     }
 
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
       max-width: 100%;
     }
 
     > div {
       display: flex;
-      padding: 1rem;
+      padding: 1.2rem;
       align-items: center;
-      gap: 1rem;
+      gap: 1.5rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
       &:last-child {
         border-bottom: none;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
       }
 
       > div:first-child {
-        width: 200px;
-        max-width: 40%;
+        width: 180px;
+        min-width: 150px;
         display: flex;
         align-items: center;
-        opacity: 0.8;
+        opacity: 0.9;
 
         span {
-          margin: 0 0.4rem;
-          width: 100%;
-          font-weight: bold;
-          font-size: 0.9rem;
+          margin: 0 0.5rem;
+          font-weight: 600;
+          font-size: 1rem;
+          color: #eee;
         }
         
         span:first-child {
             width: auto;
             color: var(--main-color);
+            font-size: 1.1rem;
+        }
+      }
+
+      > span, > p {
+        font-size: 1.05rem;
+        font-weight: 500;
+        color: #fff;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 1rem 0;
+      width: 100%;
+
+      span {
+        padding: 8px 16px;
+        border-radius: 12px;
+        background: rgba(var(--main-color-rgb), 0.1);
+        border: 1px solid rgba(var(--main-color-rgb), 0.2);
+        white-space: nowrap;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--main-color);
+        transition: all 0.3s ease;
+        cursor: default;
+
+        &:hover {
+          background: var(--main-color);
+          color: #000;
+          transform: scale(1.1) translateY(-3px);
+          box-shadow: 0 5px 15px rgba(var(--main-color-rgb), 0.4);
         }
       }
     }
@@ -80,65 +125,53 @@ const StyledAboutUs = styled.div`
 `;
 
 const AnimationArea = styled.div`
-  width: 20vw;
-  height: 20vw;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
 
-  @media (max-width: 800px) {
+  @media (max-width: 900px) {
     width: 60vw;
     height: 60vw;
-    margin-top: 2rem;
+    margin-top: 3rem;
   }
 
   .animation-ball {
-    width: 80%;
-    height: 80%;
+    width: 250px;
+    height: 250px;
     background-image: linear-gradient(
-      120deg,
+      135deg,
       var(--main-color),
       var(--background-main-color)
     );
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    border-radius: 50%;
     opacity: 0.8;
-    box-shadow: 0 0 40px var(--main-color);
-    animation: ball-animation 5s linear infinite forwards;
+    box-shadow: 0 0 50px rgba(var(--main-color-rgb), 0.5);
+    animation: ball-animation 8s ease-in-out infinite alternate;
+
+    @media (max-width: 1100px) {
+      width: 200px;
+      height: 200px;
+    }
   }
 
   @keyframes ball-animation {
     0% {
-      border-radius: 5% 5% 5% 5% / 5% 5% 5% 5%;
-      transform: translate(-50%, -50%) rotate(0deg) scale(1);
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      transform: scale(1) rotate(0deg);
     }
-    10% {
-      border-radius: 15% 10% 20% 5% / 10% 15% 10% 20%;
+    33% {
+      border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+      transform: scale(1.1) rotate(10deg);
     }
-    25% {
-      border-radius: 30% 20% 40% 10% / 25% 30% 20% 15%;
-      transform: translate(-50%, -50%) rotate(90deg) scale(1.05);
-    }
-    40% {
-      border-radius: 45% 40% 50% 40% / 40% 50% 40% 50%;
-    }
-    50% {
-      border-radius: 50%;
-      transform: translate(-50%, -50%) rotate(180deg) scale(0.9);
-    }
-    60% {
-      border-radius: 40% 50% 40% 45% / 45% 40% 50% 40%;
-    }
-    75% {
-      border-radius: 20% 30% 10% 25% / 20% 15% 30% 25%;
-      transform: translate(-50%, -50%) rotate(270deg) scale(1.05);
-    }
-    90% {
-      border-radius: 10% 15% 5% 20% / 15% 10% 20% 10%;
+    66% {
+      border-radius: 30% 70% 70% 30% / 50% 40% 30% 60%;
+      transform: scale(0.95) rotate(-5deg);
     }
     100% {
-      border-radius: 5% 5% 5% 5% / 5% 5% 5% 5%;
-      transform: translate(-50%, -50%) rotate(360deg) scale(1);
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      transform: scale(1) rotate(0deg);
     }
   }
 `;
@@ -236,33 +269,10 @@ const AboutUs = () => {
             </span>
             <span>{t("about.skills")}</span>
           </div>
-          <div
-            style={{
-              overflowX: "auto",
-              overflowY: "hidden",
-              display: "flex",
-              alignItems: "center",
-              flex: 1,
-              maxWidth: "100%",
-              gap: "10px",
-              padding: "10px 0",
-            }}
-          >
+          <div className="skills-container">
             {skills &&
               skills.map((skill) => (
-                <span
-                  style={{
-                    margin: "0 10px 0 0",
-                    padding: "6px 12px",
-                    borderRadius: "12px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    whiteSpace: "nowrap",
-                    fontSize: "0.75rem",
-                    fontWeight: "bold",
-                    color: "var(--main-color)"
-                  }}
-                >
+                <span key={skill}>
                   {skill}
                 </span>
               ))}
