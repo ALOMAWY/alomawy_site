@@ -131,13 +131,15 @@
     "rate": "التقييم (1 - 5) :",
     "visit_link": "رابط الزيارة :",
     "disc": "الوصف :",
-    "select_image_here": "اختر صورة هنا",
-    "change_image_here": "غيّر الصورة هنا",
-    "uploadingImage": "جارٍ رفع الصورة ...",
-    "add": "إضافة المشروع",
-    "add_project": "إضافة مشروع",
-    "success_add": "تمت الإضافة بنجاح",
-    "projectImage": "صورة المشروع"
+    "projectImage": "صورة المشروع",
+    "edit_project": "تعديل المشروع",
+    "manage_projects": "إدارة المشاريع",
+    "actions": "الإجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ التعديلات",
+    "cancel": "إلغاء التعديل",
+    "select_image": "اختر صورة للمشروع"
   },
   "admin": {
     "success": "نجاح!",

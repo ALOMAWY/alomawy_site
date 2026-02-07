@@ -9,6 +9,10 @@ import {
   faPenToSquare,
   faSignature,
   faStar,
+  faTrash,
+  faPlus,
+  faSave,
+  faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
@@ -17,7 +21,7 @@ import styled from "styled-components";
 import Portfolio from "./Portfolio";
 import { useMyContext } from "./Context";
 
-const API_URL = 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Styled_Form = styled.form`
   margin: 3rem auto;
@@ -252,6 +256,165 @@ const Styled_Form = styled.form`
   }
 `;
 
+const StyledTable = styled.div`
+  margin-top: 6rem;
+  padding: 3rem;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 48px;
+  color: #fff;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+
+  h3 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 1.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    opacity: 0.8;
+    color: var(--main-color);
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: var(--main-color) rgba(255, 255, 255, 0.05);
+    
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--main-color);
+      border-radius: 10px;
+    }
+  }
+
+  table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+    
+    th {
+      padding: 1.5rem 1rem;
+      text-align: left;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      opacity: 0.4;
+      letter-spacing: 0.2em;
+      font-weight: 900;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    td {
+      padding: 1.25rem 1rem;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 0.3s ease;
+      vertical-align: middle;
+      
+      &:first-child { border-radius: 16px 0 0 16px; }
+      &:last-child { border-radius: 0 16px 16px 0; }
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .project-info {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+      }
+
+      .title {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+      }
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(var(--main-color-rgb), 0.1);
+      border: 1px solid rgba(var(--main-color-rgb), 0.2);
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--main-color);
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      
+      button {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        font-size: 0.9rem;
+
+        &.edit {
+          color: #3498db;
+          &:hover { 
+            background: rgba(52, 152, 219, 0.15);
+            border-color: #3498db;
+            transform: translateY(-2px);
+          }
+        }
+
+        &.delete {
+          color: #e74c3c;
+          &:hover { 
+            background: rgba(231, 76, 60, 0.15);
+            border-color: #e74c3c;
+            transform: translateY(-2px);
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    border-radius: 32px;
+    
+    th { padding: 1rem 0.5rem; }
+    td { padding: 1rem 0.5rem; }
+  }
+`;
+
 const Dashboard = () => {
   const { t } = useTranslation();
   const { setNewProject } = useMyContext();
@@ -276,19 +439,38 @@ const Dashboard = () => {
   });
 
   const [error, setError] = useState(false);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [editId, setEditId] = useState<string | null>(null);
 
-  const [projectData, setProjectData] = useState({
+  const initialProjectData = {
     title: "",
     developer: "",
     source: "",
     visit: "",
     disc: "",
-    rate: range,
+    rate: "20",
     image: "",
-    langs,
-    techs,
-    type,
-  });
+    langs: ["english"],
+    techs: ["html", "css", "javascript"],
+    type: "website",
+  };
+
+  const [projectData, setProjectData] = useState(initialProjectData);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/projects`);
+      if (!response.ok) throw new Error("Failed to fetch projects");
+      const data = await response.json();
+      setProjects(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -302,6 +484,8 @@ const Dashboard = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
+    console.log(projectData)
 
     if (technologies.includes(name)) {
       const checkbox = e.target as HTMLInputElement;
@@ -319,7 +503,7 @@ const Dashboard = () => {
       }
     } else if (name == "type") {
       setType(value);
-    } else {
+    } else if (name == "title" || name == "developer" || name == "source" || name == "visit" || name == "disc") {
       setProjectData((prev) => ({ ...prev, [name]: value }));
     }
   };
@@ -345,9 +529,12 @@ const Dashboard = () => {
 
     const formData = new FormData();
     Object.entries(projectData).forEach(([key, value]) => {
+      // Don't send internal fields or image URL back as 'image' field
+      if (['_id', '__v', 'createdAt', 'image'].includes(key)) return;
+
       if (key === 'langs' || key === 'techs') {
         formData.append(key, JSON.stringify(value));
-      } else if (key !== 'image') {
+      } else {
         formData.append(key, value as string);
       }
     });
@@ -357,16 +544,19 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/projects`, {
-        method: 'POST',
+      const url = editId ? `${API_URL}/api/projects/${editId}` : `${API_URL}/api/projects`;
+      const method = editId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Failed to add project');
+      if (!response.ok) throw new Error('Failed to save project');
 
-      (e.target as HTMLFormElement).reset();
       setNewProject((prev) => !prev);
       handleReset();
+      fetchProjects();
     } catch (error) {
       console.error(error);
       setError(true);
@@ -375,16 +565,51 @@ const Dashboard = () => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    
+    try {
+      const response = await fetch(`${API_URL}/api/projects/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete project');
+
+      setNewProject((prev) => !prev);
+      fetchProjects();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEdit = (project: any) => {
+    setEditId(project._id);
+    setProjectData(project);
+    setTechs(project.techs);
+    setLangs(project.langs);
+    setType(project.type);
+    setRange(project.rate);
+    setImage({ file: null, url: project.image?.startsWith('/uploads') ? `${API_URL}${project.image}` : project.image });
+    
+    // Smooth scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleReset = () => {
-    setImage({ file: null, url: "" });
+    setEditId(null);
+    setProjectData(initialProjectData);
+    setTechs(["html", "css", "javascript"]);
+    setLangs(["english"]);
+    setType("website");
     setRange("20");
+    setImage({ file: null, url: "" });
   };
 
   return (
     <div>
       <Styled_Form onSubmit={handleAdd} onReset={handleReset}>
         <div className="header">
-          <h2>{t("dashboard.add_project") || "Add New Project"}</h2>
+          <h2>{editId ? t("dashboard.edit_project") || "Edit Project" : t("dashboard.add_project") || "Add New Project"}</h2>
           <div className="line" />
         </div>
 
@@ -398,6 +623,7 @@ const Dashboard = () => {
                 placeholder="Project Title"
                 id="title"
                 name="title"
+                value={projectData.title}
                 onChange={handleChange}
                 required
               />
@@ -413,6 +639,7 @@ const Dashboard = () => {
                 placeholder="Developer"
                 name="developer"
                 id="developer"
+                value={projectData.developer}
                 onChange={handleChange}
                 required
               />
@@ -428,6 +655,7 @@ const Dashboard = () => {
                 placeholder="Idea Source"
                 id="source"
                 name="source"
+                value={projectData.source}
                 onChange={handleChange}
                 required
               />
@@ -443,6 +671,7 @@ const Dashboard = () => {
                 placeholder="https://..."
                 id="visit"
                 name="visit"
+                value={projectData.visit}
                 onChange={handleChange}
               />
             </div>
@@ -457,6 +686,7 @@ const Dashboard = () => {
               placeholder="Tell us about the project..."
               id="description"
               name="disc"
+              value={projectData.disc}
               onChange={handleChange}
               required
               rows={4}
@@ -626,9 +856,85 @@ const Dashboard = () => {
         {error && <div style={{ color: '#e74c3c', textAlign: 'center', fontWeight: 'bold' }}>Please check all fields.</div>}
         
         <button type="submit" disabled={loading || uploadingImage}>
-          {uploadingImage ? t("dashboard.uploadingImage") : loading ? t("info.loading") : t("dashboard.add")}
+          {uploadingImage ? t("dashboard.uploadingImage") : loading ? t("info.loading") : editId ? (
+            <>
+              <FontAwesomeIcon icon={faSave} style={{marginRight: '10px'}} />
+              {t("dashboard.save") || "Update Project"}
+            </>
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faPlus} style={{marginRight: '10px'}} />
+              {t("dashboard.add")}
+            </>
+          )}
         </button>
+
+        {editId && (
+          <button type="button" onClick={handleReset} style={{background: 'rgba(255,255,255,0.1)', marginTop: '1rem'}}>
+            <FontAwesomeIcon icon={faTimes} style={{marginRight: '10px'}} />
+            {t("dashboard.cancel") || "Cancel Edit"}
+          </button>
+        )}
       </Styled_Form>
+
+      <div className="site-container">
+        <StyledTable>
+          <h3>{t("dashboard.manage_projects")}</h3>
+          <div className="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>{t("dashboard.projectName")}</th>
+                  <th>{t("portfolio.type")}</th>
+                  <th style={{ textAlign: "right" }}>{t("dashboard.actions")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {projects.map((project) => (
+                  <tr key={project._id}>
+                    <td>
+                      <div className="project-info">
+                        <img
+                          src={
+                            project.image?.startsWith("/uploads")
+                              ? `${API_URL}${project.image}`
+                              : project.image || "./assets/project-placeholder.png"
+                          }
+                          alt=""
+                        />
+                        <span className="title">{project.title}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="category-badge">
+                        {t(`portfolio.category.${project.type}`)}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="actions">
+                        <button
+                          className="edit"
+                          title={t("dashboard.edit")}
+                          onClick={() => handleEdit(project)}
+                        >
+                          <FontAwesomeIcon icon={faPen} />
+                        </button>
+                        <button
+                          className="delete"
+                          title={t("dashboard.delete")}
+                          onClick={() => handleDelete(project._id)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </StyledTable>
+      </div>
 
       <section style={{marginTop: '8rem', marginBottom: '8rem'}}>
         <div className="site-container">

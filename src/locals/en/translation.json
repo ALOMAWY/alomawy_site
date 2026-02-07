@@ -131,13 +131,15 @@
     "rate": "Rate (1 - 5) :",
     "visit_link": "Visit Link :",
     "disc": "Description :",
-    "select_image_here": "Select Image Here",
-    "change_image_here": "Change Image Here",
-    "uploadingImage": "Uploading ...",
-    "add": "Add Project",
-    "add_project": "Add Project",
-    "success_add": "Added Successfully",
-    "projectImage": "Project Image"
+    "projectImage": "Project Image",
+    "edit_project": "Edit Project",
+    "manage_projects": "Manage Projects",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save Changes",
+    "cancel": "Cancel Edit",
+    "select_image": "Select Project Image"
   },
   "admin": {
     "success": "Success!",
