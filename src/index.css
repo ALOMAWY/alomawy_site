@@ -19,7 +19,6 @@ html {
   list-style: none;
   /* color: var(--main-color); */
   font-weight: normal;
-  text-transform: capitalize;
   text-decoration: none;
   box-sizing: border-box;
   font-size: 0.9rem;

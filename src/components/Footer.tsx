@@ -14,7 +14,17 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const float = keyframes`
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.02); }
+`;
+
+const glow = keyframes`
+  0%, 100% { box-shadow: 0 0 30px 10px rgba(var(--main-color-rgb), 0.3); }
+  50% { box-shadow: 0 0 60px 20px rgba(var(--main-color-rgb), 0.5); }
+`;
 
 const Styled_Footer = styled.footer`
   color: #fff;
@@ -28,6 +38,7 @@ const Styled_Footer = styled.footer`
   flex-direction: column;
   gap: 4rem;
 
+  /* ... before pseudo-element ... */
   &::before {
     content: "";
     position: absolute;
@@ -41,6 +52,7 @@ const Styled_Footer = styled.footer`
   }
 
   .content {
+    /* ... content styles ... */
     display: grid;
     grid-template-columns: 1.2fr 1fr 1.2fr;
     gap: 3rem;
@@ -54,6 +66,7 @@ const Styled_Footer = styled.footer`
       gap: 4rem;
     }
 
+    /* ... contact-box styles ... */
     .contact-box {
       display: flex;
       flex-direction: column;
@@ -122,7 +135,6 @@ const Styled_Footer = styled.footer`
             }
           }
           
-          /* Align text towards the icon based on direction */
           text-align: start;
           align-items: flex-start;
           
@@ -147,39 +159,62 @@ const Styled_Footer = styled.footer`
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.5rem;
+      gap: 2.5rem;
+      text-align: center;
 
       .image {
-        width: 120px;
-        height: 120px;
-        padding: 8px;
+        width: 140px;
+        height: 140px;
         background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(var(--main-color-rgb), 0.2);
-        border-radius: 50%;
-        box-shadow: 0 0 30px rgba(var(--main-color-rgb), 0.1);
+        border: 2px solid rgba(var(--main-color-rgb), 0.3);
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+        backdrop-filter: blur(20px);
+        position: relative;
+        overflow: hidden;
+        animation: ${float} 6s ease-in-out infinite, ${glow} 4s ease-in-out infinite;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
         img {
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
+          opacity: 0.9;
+          filter: drop-shadow(0 0 20px rgba(var(--main-color-rgb), 0.2));
+        }
+
+        &:hover {
           border-radius: 50%;
+          border-color: var(--main-color);
+          transform: scale(1.05);
         }
       }
 
+      .text-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: center;
+      }
+
       h1 {
-        font-size: 1.8rem;
-        font-weight: 800;
+        font-size: 2rem;
+        font-weight: 900;
         margin: 0;
-        background: linear-gradient(135deg, #fff 30%, var(--main-color));
+        background: linear-gradient(135deg, #fff 40%, var(--main-color));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+        text-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
       }
 
       p {
-        font-size: 0.95rem;
+        font-size: 1rem;
         line-height: 1.8;
-        color: rgba(255, 255, 255, 0.7);
-        max-width: 350px;
+        color: rgba(255, 255, 255, 0.6);
+        max-width: 400px;
+        margin: 0;
+        font-weight: 500;
+        letter-spacing: 0.2px;
       }
     }
 
@@ -198,9 +233,11 @@ const Styled_Footer = styled.footer`
         flex-wrap: wrap;
         gap: 12px;
         justify-content: flex-end;
+        padding-bottom: 2rem; /* Add space for the staircase drop */
 
         @media (max-width: 1100px) {
           justify-content: center;
+          padding-bottom: 0;
         }
 
         a {
@@ -214,13 +251,35 @@ const Styled_Footer = styled.footer`
           border-radius: 15px;
           color: #fff;
           font-size: 1.4rem;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+          /* Staircase Effect & Individual Hover */
+          &:nth-child(1) { transform: translateY(0px); }
+          &:nth-child(1):hover { transform: translateY(0px) rotate(8deg) !important; }
+          
+          &:nth-child(2) { transform: translateY(35px); }
+          &:nth-child(2):hover { transform: translateY(35px) rotate(8deg) !important; }
+          
+          &:nth-child(3) { transform: translateY(70px); }
+          &:nth-child(3):hover { transform: translateY(70px) rotate(8deg) !important; }
+          
+          &:nth-child(4) { transform: translateY(105px); }
+          &:nth-child(4):hover { transform: translateY(105px) rotate(8deg) !important; }
+          
+          &:nth-child(5) { transform: translateY(140px); }
+          &:nth-child(5):hover { transform: translateY(140px) rotate(8deg) !important; }
+          
+          &:nth-child(6) { transform: translateY(175px); }
+          &:nth-child(6):hover { transform: translateY(175px) rotate(8deg) !important; }
+
+          @media (max-width: 1100px) {
+            transform: none !important;
+          }
 
           &:hover {
             background: var(--main-color);
             color: #000;
-            transform: translateY(-8px) rotate(8deg);
-            box-shadow: 0 10px 20px rgba(var(--main-color-rgb), 0.3);
+            box-shadow: 0 15px 30px rgba(var(--main-color-rgb), 0.4);
             border-color: var(--main-color);
           }
         }
@@ -314,8 +373,10 @@ const Footer = () => {
           <div className="image">
             <img src="./logos/newLogo.webp" alt="Alomawy Logo" />
           </div>
-          <h1>{t("footer.about_title")}</h1>
-          <p>{t("footer.about_desc")}</p>
+          <div className="text-content">
+            <h1>{t("footer.about_title")}</h1>
+            <p>{t("footer.about_desc")}</p>
+          </div>
         </div>
 
         <div className="social-extra">
