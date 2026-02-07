@@ -1,21 +1,33 @@
 import express from 'express';
 import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import Project from '../models/Project.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router = express.Router();
 
-// Configure Multer for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const uploadPath = path.resolve(__dirname, '../uploads');
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+if (!process.env.CLOUDINARY_CLOUD_NAME) {
+  console.error('CRITICAL: Cloudinary credentials missing in environment variables!');
+} else {
+  console.log('Cloudinary configured with cloud name:', process.env.CLOUDINARY_CLOUD_NAME);
+}
+
+// Configure Multer with Cloudinary Storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'alomawy_projects',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   },
 });
 
@@ -33,8 +45,8 @@ router.get('/', async (req, res) => {
 
 // Add a new project
 router.post('/', upload.single('image'), async (req, res) => {
-  console.log('Received POST request to add project:', req.body);
-  if (req.file) console.log('File uploaded:', req.file.filename);
+  console.log('Received POST request to add project (Cloudinary):', req.body);
+  if (req.file) console.log('File uploaded to Cloudinary:', req.file.path);
   
   const { title, developer, source, visit, disc, rate, langs, techs, type, date } = req.body;
   
@@ -53,7 +65,7 @@ router.post('/', upload.single('image'), async (req, res) => {
     techs: parsedTechs,
     type,
     date,
-    image: req.file ? `/uploads/${req.file.filename}` : '',
+    image: req.file ? req.file.path : '',
   });
 
   try {
@@ -61,6 +73,65 @@ router.post('/', upload.single('image'), async (req, res) => {
     res.status(201).json(newProject);
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+});
+
+// Update a project
+router.put('/:id', upload.single('image'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('Update request for ID:', id);
+    const { title, developer, source, visit, disc, rate, langs, techs, type, date } = req.body;
+    console.log('Request body:', req.body);
+    
+    const existingProject = await Project.findById(id);
+    if (!existingProject) {
+      console.log('Project not found');
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    const updateData = {
+      title,
+      developer,
+      source,
+      visit,
+      disc,
+      rate,
+      type,
+      date,
+    };
+
+    if (langs) updateData.langs = typeof langs === 'string' ? JSON.parse(langs) : langs;
+    if (techs) updateData.techs = typeof techs === 'string' ? JSON.parse(techs) : techs;
+
+    if (req.file) {
+      console.log('New file uploaded to Cloudinary:', req.file.path);
+      updateData.image = req.file.path;
+    }
+
+    console.log('Final update data:', updateData);
+    const updatedProject = await Project.findByIdAndUpdate(id, updateData, { new: true });
+    res.json(updatedProject);
+  } catch (err) {
+    console.error('Update error:', err);
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Delete a project
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id);
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+
+    // For now, removing the MongoDB entry. 
+    // In a production app, you might also want to delete the asset from Cloudinary using cloudinary.uploader.destroy()
+    
+    await Project.findByIdAndDelete(id);
+    res.json({ message: 'Project deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

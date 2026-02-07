@@ -40,6 +40,12 @@ app.get('/', (req, res) => {
 });
 app.use('/api/projects', projectRoutes);
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('SERVER ERROR:', err);
+  res.status(500).json({ message: 'Internal Server Error', error: err.message });
+});
+
 // MongoDB Connection
 const connectDB = async () => {
   try {
