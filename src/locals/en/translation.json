@@ -8,12 +8,12 @@
     "social_media": "Social Media"
   },
   "info": {
-    "welcome": "Hello Everyone",
+    "welcome": "Hello everyone",
     "description": {
-      "name": "I am Abdalrahman ALDABBAS.",
-      "work": "I work as a front-end developer.",
-      "from": "I am From Syria Damascus.",
-      "website": "This Is A Simple Personal Website .",
+      "name": "I am Abdalrahman Aldabbas.",
+      "work": "I work as a Front-End Developer.",
+      "from": "I am from Damascus, Syria.",
+      "website": "This is a simple personal website.",
       "technology": "I developed this website using ReactJS."
     },
     "numbers": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -24,45 +24,45 @@
     "home": "Home",
     "services": "Services",
     "portfolio": "Portfolio",
-    "contact_us": "Contact Us",
-    "about_us": "About Us",
-    "social_media": "Social Media",
-    "dash": "Admin-Dashboard"
+    "contact_us": "Contact us",
+    "about_us": "About us",
+    "social_media": "Social media",
+    "dash": "Admin dashboard"
   },
   "services": {
     "items": {
-      "first_service": "Clean Code",
-      "first_example": "It is used to improve performance It also allows for ease of modification in the future",
+      "first_service": "Clean code",
+      "first_example": "It is used to improve performance. It also allows for ease of modification in the future.",
 
-      "second_service": "Web Development",
-      "second_example": "Developing large and small websites using modern technologies and a dynamic manner",
+      "second_service": "Web development",
+      "second_example": "Developing large and small websites using modern technologies in a dynamic manner.",
 
-      "third_service": "Performance Application",
-      "third_example": "Ensuring the best possible performance",
+      "third_service": "Performance application",
+      "third_example": "Ensuring the best possible performance.",
 
-      "fourth_service": "Responsive Design",
-      "fourth_example": "It works on all screens such as computers, tablets, mobile phones, and TV's",
+      "fourth_service": "Responsive design",
+      "fourth_example": "It works on all screens, such as computers, tablets, mobile phones, and TVs.",
 
       "fifth_service": "Offers",
-      "fifth_example": "Offers continue throughout the year Depending on the type of service",
+      "fifth_example": "Offers continue throughout the year, depending on the type of service.",
 
-      "sixth_service": "Web Design",
-      "sixth_example": "Modern website designs with some tips Easy to browse with users",
+      "sixth_service": "Web design",
+      "sixth_example": "Modern website designs with helpful tips; easy for users to browse.",
 
-      "seventh_service": "Customers Service",
-      "seventh_example": "We respond to requests we receive as quickly as possible",
+      "seventh_service": "Customer service",
+      "seventh_example": "We respond to requests we receive as quickly as possible.",
 
-      "eighth_service": "Upload To Server",
-      "eighth_example": "Uploading websites online at low cost He often has offers"
+      "eighth_service": "Upload to server",
+      "eighth_example": "Uploading websites online at a low cost. It often includes special offers."
     }
   },
   "form": {
     "placeholder": {
       "name": "Username",
       "email": "Email",
-      "message": "Your Message .."
+      "message": "Your message..."
     },
-    "send": "Send Message"
+    "send": "Send message"
   },
   "socials": {
     "items": {
@@ -106,83 +106,83 @@
     "visit": "Visit"
   },
   "about": {
-    "fullname": "Full Name :",
-    "age": "Age :",
-    "status": "Status : ",
-    "status_now": "Not Working Now",
-    "marital_status": "Marital Status :",
+    "fullname": "Full name:",
+    "age": "Age:",
+    "status": "Status:",
+    "status_now": "Currently not working",
+    "marital_status": "Marital status:",
     "marital_status_now": "Single",
-    "work": "Work :",
+    "work": "Work:",
     "work_now": "Front-End Developer",
-    "position": "Position :",
+    "position": "Position:",
     "position_now": "Junior",
-    "exp": "Experience :",
-    "skills": "Skills :",
+    "exp": "Experience:",
+    "skills": "Skills:",
     "years": "Years",
     "months": "Months",
     "days": "Days"
   },
   "dashboard": {
-    "projectName": "Project Title :",
-    "developerName": "Developer Name :",
-    "technologies": "Technologies :",
-    "languages": "Languages :",
-    "idea_source": "Idea Source :",
-    "rate": "Rate (1 - 5) :",
-    "visit_link": "Visit Link :",
-    "disc": "Description :",
-    "projectImage": "Project Image",
-    "edit_project": "Edit Project",
-    "manage_projects": "Manage Projects",
+    "projectName": "Project title:",
+    "developerName": "Developer name:",
+    "technologies": "Technologies:",
+    "languages": "Languages:",
+    "idea_source": "Idea source:",
+    "rate": "Rate (1 - 5):",
+    "visit_link": "Visit link:",
+    "disc": "Description:",
+    "projectImage": "Project image",
+    "edit_project": "Edit project",
+    "manage_projects": "Manage projects",
     "actions": "Actions",
     "edit": "Edit",
     "delete": "Delete",
-    "save": "Save Changes",
-    "cancel": "Cancel Edit",
-    "select_image": "Select Project Image"
+    "save": "Save changes",
+    "cancel": "Cancel edit",
+    "select_image": "Select project image"
   },
   "admin": {
     "success": "Success!",
     "placeholder": {
-      "email": "Email :",
-      "pass": "Password :"
+      "email": "Email:",
+      "pass": "Password:"
     },
-    "sign": "Sign, Im Admin",
-    "ask": "Are You Admin ? ",
+    "sign": "Sign in as Admin",
+    "ask": "Are you an admin?",
     "error": "There was an error in the provided information.",
-    "locked_title": "Access Locked",
+    "locked_title": "Access locked",
     "locked_msg": "Too many failed attempts. Please try again in {{minutes}} minutes.",
-    "wait": "System Locked"
+    "wait": "System locked"
   },
   "portfolio": {
-    "developer": "Developer :",
-    "source": "Idea Source :",
-    "type": "Type :",
-    "disc": "Description :",
-    "techs": "Technologies :",
-    "langs": "Languages :",
-    "date": "Date :",
-    "rate": "Rate :",
-    "no_projects": "No Projects Added Yet",
-    "no_projects_with_category": "No Projects With Category {{category}}",
+    "developer": "Developer:",
+    "source": "Idea source:",
+    "type": "Type:",
+    "disc": "Description:",
+    "techs": "Technologies:",
+    "langs": "Languages:",
+    "date": "Date:",
+    "rate": "Rate:",
+    "no_projects": "No projects added yet",
+    "no_projects_with_category": "No projects found in the {{category}} category",
     "visit":"Visit",
     "category": {
       "all": "All",
-      "website": "Website",
-      "game": "Game",
-      "simple": "Simple",
-      "dashboard": "Dashboard",
-      "app": "App"
+      "website": "Websites",
+      "game": "Games",
+      "simple": "Simple projects",
+      "dashboard": "Dashboards",
+      "app": "Apps"
     }
   },
   "footer": {
-    "address_title": "Syria Damascus",
-    "city": "Darraya",
-    "phone": "+963 0952 437 717 Syria",
+    "address_title": "Damascus, Syria",
+    "city": "Darayya",
+    "phone": "+963 0952 437 717 (Syria)",
     "phone_label": "Phone",
     "address_label": "Address",
     "email_label": "Email",
-    "about_title": "About My Website",
+    "about_title": "About my website",
     "about_desc": "This is a simple personal website built with React. It is a place where I share my thoughts and ideas.",
     "rights": "All rights reserved."
   },
