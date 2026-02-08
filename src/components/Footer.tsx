@@ -29,14 +29,16 @@ const glow = keyframes`
 const Styled_Footer = styled.footer`
   color: #fff;
   border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
-  padding: 4rem 2rem 2rem;
+  padding: 4rem 2rem;
   background: rgba(0, 12, 20, 0.7);
   backdrop-filter: blur(25px);
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 4rem;
+  justify-content: start;
+  min-height: 100vh;
+  gap: 2rem;
 
   /* ... before pseudo-element ... */
   &::before {
@@ -59,6 +61,11 @@ const Styled_Footer = styled.footer`
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
+    flex:1;
+
+    div {
+    justify-content:center;
+    }
 
     @media (max-width: 1100px) {
       grid-template-columns: 1fr;

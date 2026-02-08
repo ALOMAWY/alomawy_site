@@ -1,4 +1,4 @@
-import { faKey, faUserTie, faCheckCircle, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faKey, faUserTie, faCheckCircle, faSpinner, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 import styled, { keyframes, css } from "styled-components";
@@ -144,6 +144,7 @@ const AdminForm = () => {
   const [error, setError] = useState(false);
   const [lockoutTime, setLockoutTime] = useState<number | null>(null);
   const [remainingMinutes, setRemainingMinutes] = useState<number>(0);
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
 
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
@@ -242,7 +243,7 @@ const AdminForm = () => {
           <FontAwesomeIcon icon={faKey} />
         </label>
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           name="password"
           placeholder={t("admin.placeholder.pass")}
           id="adminPass"
@@ -251,6 +252,29 @@ const AdminForm = () => {
           onChange={handleInputChange}
           required
         />
+        <div 
+          onClick={() => setShowPassword(!showPassword)}
+          style={{ 
+            cursor: 'pointer', 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '25px',
+            color: 'var(--main-color)',
+            opacity: 0.6,
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '1';
+            e.currentTarget.style.transform = 'scale(1.2)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.6';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+        </div>
       </div>
       
       <div className="error-msg" style={{ minHeight: "1.5rem" }}>

@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import Portfolio from "./Portfolio";
 import { useMyContext } from "./Context";
+import { getProjectTypeStyle } from "../utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -407,11 +408,141 @@ const StyledTable = styled.div`
   }
 
   @media (max-width: 768px) {
-    padding: 1.5rem;
-    border-radius: 32px;
+    padding: 0.5rem;
+    border-radius: 40px;
+    margin-top: 3rem;
+    background: transparent;
+    box-shadow: none;
+    border: none;
     
-    th { padding: 1rem 0.5rem; }
-    td { padding: 1rem 0.5rem; }
+    h3 { 
+      margin-bottom: 2rem;
+      font-size: 1.25rem;
+      letter-spacing: 0.2em;
+    }
+
+    .table-wrapper { overflow: visible; }
+
+    table, thead, tbody, th, td, tr {
+      display: block;
+      width: 100%;
+      min-width: unset;
+    }
+
+    thead { display: none; }
+
+    tr {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(40px);
+      border-radius: 40px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      box-sizing: border-box;
+    }
+
+    td {
+      padding: 1.5rem 0;
+      background: transparent !important;
+      display: grid !important;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      
+      &:first-child { 
+        padding-top: 0;
+        border-radius: 0; 
+      }
+      &:last-child { 
+        padding-bottom: 0;
+        border-bottom: none !important;
+        border-radius: 0; 
+      }
+
+      &::before {
+        content: attr(data-label) ": ";
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        opacity: 0.4;
+        font-weight: 900;
+        letter-spacing: 0.15em;
+        color: #fff;
+      }
+
+      /* First TD: Project Info (Title + Image) */
+      &:first-child {
+        display: flex !important;
+        justify-content: flex-start;
+        gap: 1.5rem;
+
+        &::before { display: none; }
+
+        .project-info {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          width: 100%;
+
+          img {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }
+
+          .title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #3498db; /* Blue color from image */
+            letter-spacing: 0.5px;
+            white-space: normal;
+          }
+        }
+      }
+
+      /* Content alignment for Grid */
+      .category-badge, .actions {
+        justify-self: end;
+      }
+
+      .category-badge {
+        padding: 8px 16px;
+        background: rgba(52, 152, 219, 0.1);
+        border: 1px solid rgba(52, 152, 219, 0.3);
+        border-radius: 12px;
+        color: #3498db;
+        box-shadow: 0 0 15px rgba(52, 152, 219, 0.1);
+      }
+
+      .actions {
+        display: flex;
+        gap: 1rem;
+        
+        button {
+          width: 48px;
+          height: 48px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          color: #fff;
+          transition: all 0.3s ease;
+
+          &.edit { color: #3498db; }
+          &.delete { color: #e74c3c; }
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+
+    tr:hover td { transform: none; }
   }
 `;
 
@@ -563,7 +694,7 @@ const Dashboard = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    if (!window.confirm(t("dashboard.confirm_delete") || "Are you sure you want to delete this project?")) return;
     
     try {
       const response = await fetch(`${API_URL}/api/projects/${id}`, {
@@ -850,7 +981,7 @@ const Dashboard = () => {
           />
         </div>
 
-        {error && <div style={{ color: '#e74c3c', textAlign: 'center', fontWeight: 'bold' }}>Please check all fields.</div>}
+        {error && <div style={{ color: '#e74c3c', textAlign: 'center', fontWeight: 'bold' }}>{t("dashboard.check_fields") || "Please check all fields."}</div>}
         
         <button type="submit" disabled={loading || uploadingImage}>
           {uploadingImage ? t("dashboard.uploadingImage") : loading ? t("info.loading") : editId ? (
@@ -889,7 +1020,7 @@ const Dashboard = () => {
               <tbody>
                 {projects.map((project) => (
                   <tr key={project._id}>
-                    <td>
+                    <td data-label={t("dashboard.projectName")}>
                       <div className="project-info">
                         <img
                           src={
@@ -902,12 +1033,19 @@ const Dashboard = () => {
                         <span className="title">{project.title}</span>
                       </div>
                     </td>
-                    <td>
-                      <span className="category-badge">
+                    <td data-label={t("portfolio.type")}>
+                      <span 
+                        className="category-badge" 
+                        style={{ 
+                          backgroundColor: getProjectTypeStyle(project.type).accentBg, 
+                          borderColor: getProjectTypeStyle(project.type).color + "50",
+                          color: getProjectTypeStyle(project.type).color
+                        }}
+                      >
                         {t(`portfolio.category.${project.type}`)}
                       </span>
                     </td>
-                    <td>
+                    <td data-label={t("dashboard.actions")}>
                       <div className="actions">
                         <button
                           className="edit"

@@ -4,6 +4,7 @@ import styled, { keyframes } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useMyContext } from "./Context";
+import { getProjectTypeStyle } from "../utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -326,9 +327,9 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
   width: 100%;
   position: relative;
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 32px;
+  border-radius: 40px;
   overflow: hidden;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -337,33 +338,22 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
   color: #fff;
   box-shadow: 
     0 10px 30px -10px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
 
   &:hover {
     transform: translateY(-8px);
     background: rgba(255, 255, 255, 0.05);
     border-color: ${props => props.$color}50;
     box-shadow: 
-      0 20px 40px -15px rgba(0, 0, 0, 0.6),
-      0 0 20px -5px ${props => props.$color}30,
-      inset 0 1px 1px rgba(255, 255, 255, 0.15);
-  }
-
-  h1 {
-    font-size: 1.4rem;
-    font-weight: 900;
-    margin: 0 0 16px 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    background: linear-gradient(to right, #fff, ${props => props.$color});
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+      0 25px 50px -15px rgba(0, 0, 0, 0.7),
+      0 0 30px -5px ${props => props.$color}40,
+      inset 0 1px 1px rgba(255, 255, 255, 0.1);
   }
 
   .image-container {
     width: 100%;
     aspect-ratio: 16 / 9;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
     margin-bottom: 24px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -373,7 +363,7 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.4));
+      background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.5));
     }
 
     img {
@@ -388,64 +378,137 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
     transform: scale(1.1);
   }
 
-  .infos {
+  .content {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 1.5rem;
+    flex-grow: 1;
+  }
 
-    .info {
+  .header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.2;
+      background: linear-gradient(to right, #fff, ${props => props.$color});
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  .description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-weight: 400;
+  }
+
+  .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .tag {
+    padding: 6px 12px;
+    background: ${props => props.$accent};
+    border: 1px solid ${props => props.$color}30;
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: ${props => props.$color};
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: ${props => props.$color}20;
+      border-color: ${props => props.$color};
+    }
+  }
+
+  .langs-tag {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+    .info-item {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 12px;
-      font-size: 0.8rem;
-      border: 1px solid rgba(255, 255, 255, 0.02);
+      flex-direction: column;
+      gap: 4px;
 
       .label {
-        opacity: 0.4;
+        font-size: 0.6rem;
         text-transform: uppercase;
-        font-weight: 900;
         letter-spacing: 1px;
-        font-size: 0.7rem;
+        opacity: 0.4;
+        font-weight: 900;
       }
 
       .value {
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 1);
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 60%;
       }
     }
   }
 
-  .visit-btn {
-    margin-top: auto;
-    width: 100%;
-    padding: 16px;
-    background: ${props => props.$accent};
-    border: 1px solid ${props => props.$color}40;
-    border-radius: 16px;
-    color: #fff;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 4px;
-    transition: all 0.3s ease;
-    text-align: center;
-    text-decoration: none;
+  .actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
 
-    &:hover {
+    .visit-btn {
+      flex: 1;
+      padding: 14px;
       background: ${props => props.$color};
-      box-shadow: 0 0 20px ${props => props.$color}50;
-      transform: scale(1.02);
-    }
-    
-    &:active {
-      transform: scale(0.98);
+      border-radius: 16px;
+      color: #fff;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: all 0.3s ease;
+      text-align: center;
+      text-decoration: none;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      &:hover {
+        box-shadow: 0 10px 20px ${props => props.$color}40;
+        transform: translateY(-2px);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
     }
   }
 `;
@@ -466,93 +529,63 @@ const Card = ({ project }: any) => {
     visit,
   } = project;
 
-  let color: string = "";
-  let accentBg: string = "";
-
-  switch (type) {
-    case "website":
-      color = "#3498db";
-      accentBg = "rgba(52, 152, 219, 0.1)";
-      break;
-    case "game":
-      color = "#9b59b6";
-      accentBg = "rgba(155, 89, 182, 0.1)";
-      break;
-    case "simple":
-      color = "#2ecc71";
-      accentBg = "rgba(46, 204, 113, 0.1)";
-      break;
-    case "dashboard":
-      color = "#f1c40f";
-      accentBg = "rgba(241, 196, 15, 0.1)";
-      break;
-    case "app":
-      color = "#e91e63";
-      accentBg = "rgba(233, 30, 99, 0.1)";
-      break;
-    default:
-      color = "#3498db";
-      accentBg = "rgba(52, 152, 219, 0.1)";
-      break;
-  }
+  const { color, accentBg } = getProjectTypeStyle(type);
 
   const projectImage = image?.startsWith('/uploads') ? `${API_URL}${image}` : image;
 
   return (
     <StyledCard $color={color} $accent={accentBg}>
-      <h1>{title}</h1>
       <div className="image-container">
         <img src={projectImage || "./assets/project-placeholder.png"} alt="Project" />
       </div>
 
-      <div className="infos">
-        <div className="info">
-          <span className="label text-color-main">{t("portfolio.developer")}</span>
-          <span className="value">
-            {developer}
-            {["ALOMAWY", "alomawy", "Abdalrahman ALDABBAS"].includes(developer) && (
-              <span style={{ fontSize: "0.7em", color: "var(--main-color)", marginLeft: "5px", fontFamily: "cursive" }}>
-                (Me)
-              </span>
-            )}
-          </span>
+      <div className="content">
+        <div className="header-info">
+          <h1>{title}</h1>
+          <Rate rate={rate} color={color} />
         </div>
 
-        <div className="info">
-          <span className="label">{t("portfolio.type")}</span>
-          <span className="value">{type}</span>
+        <p className="description">{disc}</p>
+
+        <div className="tags-container">
+          {techs?.map((tech: string, i: number) => (
+            <span key={i} className="tag">{tech}</span>
+          ))}
+          {langs?.map((lang: string, i: number) => (
+            <span key={`lang-${i}`} className="tag langs-tag">{lang}</span>
+          ))}
         </div>
 
-        <div className="info">
-          <span className="label">{t("portfolio.source")}</span>
-          <span className="value">{source}</span>
+        <div className="info-grid">
+          <div className="info-item">
+            <span className="label text-color-main">{t("portfolio.developer")}</span>
+            <span className="value">
+              {developer}
+              {["ALOMAWY", "alomawy", "Abdalrahman ALDABBAS"].includes(developer) && (
+                <span style={{ fontSize: "0.7em", color: "var(--main-color)", marginLeft: "5px", fontFamily: "cursive" }}>
+                  (Me)
+                </span>
+              )}
+            </span>
+          </div>
+
+          <div className="info-item">
+            <span className="label">{t("portfolio.type")}</span>
+            <span className="value">{t(`portfolio.category.${type}`)}</span>
+          </div>
+
+          <div className="info-item">
+            <span className="label">{t("portfolio.source")}</span>
+            <span className="value">{source}</span>
+          </div>
         </div>
 
-        <div className="info">
-          <span className="label">{t("portfolio.disc")}</span>
-          <span className="value">{disc}</span>
-        </div>
-
-        <div className="info">
-          <span className="label">{t("portfolio.techs")}</span>
-          <span className="value">
-            {techs?.map((e: any, i: number) => (
-              <span key={i}>{e}{i < techs.length - 1 ? ", " : ""}</span>
-            ))}
-          </span>
-        </div>
-
-        <div className="info">
-          <span className="label">{t("portfolio.rate")}</span>
-          <span className="value">
-            <Rate rate={rate} color={color} />
-          </span>
+        <div className="actions">
+          <a href={visit} className="visit-btn" target="_blank" rel="noreferrer">
+            {t("portfolio.visit") || "Visit"}
+          </a>
         </div>
       </div>
-
-      <a href={visit} className="visit-btn" target="_blank" rel="noreferrer">
-        {t("portfolio.visit") || "Visit"}
-      </a>
     </StyledCard>
   );
 };

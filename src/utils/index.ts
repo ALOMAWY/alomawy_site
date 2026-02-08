@@ -127,7 +127,20 @@ export const calculate = (date: string): string => {
     ? `${years}-Years , ${months}-Months, ${days}-Days `
     : `${years} سنة و ${months} أشهر و ${days} يوم `;
 };
-
-
-
+export const getProjectTypeStyle = (type: string) => {
+  switch (type) {
+    case "website":
+      return { color: "#3498db", accentBg: "rgba(52, 152, 219, 0.1)" };
+    case "game":
+      return { color: "#9b59b6", accentBg: "rgba(155, 89, 182, 0.1)" };
+    case "simple":
+      return { color: "#2ecc71", accentBg: "rgba(46, 204, 113, 0.1)" };
+    case "dashboard":
+      return { color: "#f1c40f", accentBg: "rgba(241, 196, 15, 0.1)" };
+    case "app":
+      return { color: "#e91e63", accentBg: "rgba(233, 30, 99, 0.1)" };
+    default:
+      return { color: "#3498db", accentBg: "rgba(52, 152, 219, 0.1)" };
+  }
+};
 

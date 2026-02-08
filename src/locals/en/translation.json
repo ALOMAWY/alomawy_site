@@ -139,7 +139,13 @@
     "delete": "Delete",
     "save": "Save changes",
     "cancel": "Cancel edit",
-    "select_image": "Select project image"
+    "select_image": "Select project image",
+    "add_project": "Add New Project",
+    "uploading": "Uploading...",
+    "uploadingImage": "Uploading Image...",
+    "add": "Add Project",
+    "check_fields": "Please check all fields.",
+    "confirm_delete": "Are you sure you want to delete this project?"
   },
   "admin": {
     "success": "Success!",
