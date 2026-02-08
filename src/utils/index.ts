@@ -19,8 +19,6 @@ export const handleChangeLang = (i18n: any): void => {
     document.body.style.fontFamily = `Alexandria, sans-serif`;
     document.body.style.direction = `rtl`;
   }
-
-  console.log("Click", lang);
 };
 
 export const handleSetTheme = (color: string, change?: boolean): void => {

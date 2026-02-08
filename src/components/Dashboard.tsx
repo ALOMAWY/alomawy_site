@@ -464,7 +464,7 @@ const Dashboard = () => {
       const data = await response.json();
       setProjects(data);
     } catch (error) {
-      console.error(error);
+      // Failed to fetch
     }
   };
 
@@ -484,8 +484,6 @@ const Dashboard = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
-    console.log(projectData)
 
     if (technologies.includes(name)) {
       const checkbox = e.target as HTMLInputElement;
@@ -558,7 +556,6 @@ const Dashboard = () => {
       handleReset();
       fetchProjects();
     } catch (error) {
-      console.error(error);
       setError(true);
     } finally {
       setLoading(false);
@@ -578,7 +575,7 @@ const Dashboard = () => {
       setNewProject((prev) => !prev);
       fetchProjects();
     } catch (error) {
-      console.error(error);
+      // Failed to delete
     }
   };
 

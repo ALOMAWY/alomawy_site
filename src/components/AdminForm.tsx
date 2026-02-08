@@ -151,17 +151,14 @@ const AdminForm = () => {
 
   // Check lockout on mount and every 10 seconds
   useEffect(() => {
-    console.log("AdminForm: Mounting, checking initial lockout status...");
     const checkLockout = () => {
       const lockoutUntil = Number(getItemFromLocalStorage("lockout_until", 0));
       if (lockoutUntil && lockoutUntil > Date.now()) {
         const remaining = Math.ceil((lockoutUntil - Date.now()) / 60000);
-        console.log(`AdminForm: System is locked for ${remaining} more minutes.`);
         setLockoutTime(lockoutUntil);
         setRemainingMinutes(remaining);
       } else {
         if (lockoutTime) {
-          console.log("AdminForm: Lockout expired, enabling form.");
           setLockoutTime(null);
           removeItemInLocalStorage("lockout_until");
           removeItemInLocalStorage("login_attempts");
@@ -176,10 +173,8 @@ const AdminForm = () => {
 
   const handleSign = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("AdminForm: Login attempt started.");
 
     if (lockoutTime) {
-      console.warn("AdminForm: Attempt blocked due to active lockout.");
       return;
     }
 
@@ -187,17 +182,11 @@ const AdminForm = () => {
     const formData = new FormData(e.target as HTMLFormElement);
     const { email, password } = Object.fromEntries(formData);
 
-    console.log("AdminForm: Comparing credentials...");
-    if (!adminEmail || !adminPassword) {
-      console.error("AdminForm: Environment variables (Email/Password) are missing! Check .env file.");
-    }
-
     setLoading(true);
 
     // Smooth simulated check for a better feel
     setTimeout(() => {
       if (email === adminEmail && password === adminPassword) {
-        console.log("AdminForm: Credentials correct. Logging in...");
         setSuccess(true);
         setLoading(false);
         removeItemInLocalStorage("login_attempts");
@@ -207,12 +196,10 @@ const AdminForm = () => {
         }, 1000);
       } else {
         const attempts = Number(getItemFromLocalStorage("login_attempts", 0)) + 1;
-        console.log(`AdminForm: Credentials incorrect. Attempt #${attempts}`);
         setItemInLocalStorage("login_attempts", attempts);
 
         if (attempts >= 7) {
           const until = Date.now() + 15 * 60 * 1000;
-          console.log("AdminForm: Lockout threshold reached. Locking for 15 minutes.");
           setItemInLocalStorage("lockout_until", until);
           setLockoutTime(until);
           setRemainingMinutes(15);
@@ -227,7 +214,6 @@ const AdminForm = () => {
 
   const handleInputChange = () => {
     if (error) {
-      console.log("AdminForm: User is typing, clearing error state.");
       setError(false);
     }
   };

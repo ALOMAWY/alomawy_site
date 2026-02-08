@@ -18,8 +18,6 @@ cloudinary.config({
 
 if (!process.env.CLOUDINARY_CLOUD_NAME) {
   console.error('CRITICAL: Cloudinary credentials missing in environment variables!');
-} else {
-  console.log('Cloudinary configured with cloud name:', process.env.CLOUDINARY_CLOUD_NAME);
 }
 
 // Configure Multer with Cloudinary Storage
@@ -45,9 +43,6 @@ router.get('/', async (req, res) => {
 
 // Add a new project
 router.post('/', upload.single('image'), async (req, res) => {
-  console.log('Received POST request to add project (Cloudinary):', req.body);
-  if (req.file) console.log('File uploaded to Cloudinary:', req.file.path);
-  
   const { title, developer, source, visit, disc, rate, langs, techs, type, date } = req.body;
   
   // Parse arrays if they come as strings (from FormData)
@@ -80,13 +75,10 @@ router.post('/', upload.single('image'), async (req, res) => {
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('Update request for ID:', id);
     const { title, developer, source, visit, disc, rate, langs, techs, type, date } = req.body;
-    console.log('Request body:', req.body);
     
     const existingProject = await Project.findById(id);
     if (!existingProject) {
-      console.log('Project not found');
       return res.status(404).json({ message: 'Project not found' });
     }
 
@@ -105,11 +97,9 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     if (techs) updateData.techs = typeof techs === 'string' ? JSON.parse(techs) : techs;
 
     if (req.file) {
-      console.log('New file uploaded to Cloudinary:', req.file.path);
       updateData.image = req.file.path;
     }
 
-    console.log('Final update data:', updateData);
     const updatedProject = await Project.findByIdAndUpdate(id, updateData, { new: true });
     res.json(updatedProject);
   } catch (err) {

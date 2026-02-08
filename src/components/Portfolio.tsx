@@ -249,7 +249,7 @@ const Portfolio = () => {
       const data = await response.json();
       setProjects(data);
     } catch (error) {
-      console.error('Error fetching data from MongoDB:', error);
+      // Error fetching data
     } finally {
       // Small timeout to ensure transition is smooth and not too jarring
       setTimeout(() => setLoading(false), 500);

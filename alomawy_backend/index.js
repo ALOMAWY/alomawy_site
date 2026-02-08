@@ -42,7 +42,6 @@ app.use('/api/projects', projectRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error('SERVER ERROR:', err);
   res.status(500).json({ message: 'Internal Server Error', error: err.message });
 });
 
@@ -51,19 +50,16 @@ const connectDB = async () => {
   try {
     if (mongoose.connection.readyState === 1) return;
     await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000, // Fail fast if connection issues
-      socketTimeoutMS: 45000, // Close sockets after 45s
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
     });
-    console.log('Connected to MongoDB successfully');
   } catch (err) {
-    console.error('MongoDB connection error:', err);
+    // MongoDB connection error
   }
 }
 
 
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.listen(PORT, () => {});
 
 export default app;
