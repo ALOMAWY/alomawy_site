@@ -16,6 +16,9 @@ const Styled_Name = styled.h3`
   align-items: center;
   gap: 2px;
   
+  @media (max-width: 540px) {
+    font-size: 0.85rem;
+  }
   &::after {
     content: '';
     width: 2px;

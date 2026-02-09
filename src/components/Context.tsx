@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
 } from "react";
 
 type ContextType = {
@@ -13,6 +14,8 @@ type ContextType = {
   setIsMobile: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isDropdownOpen: boolean;
+  registerDropdown: (id: string, isOpen: boolean) => void;
   newProject: boolean;
   setNewProject: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -26,19 +29,28 @@ const ContextProvider = ({ children }: ProviderProps) => {
   const [isList, setIsList] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1040);
   const [isOpen, setIsOpen] = useState(false);
+  const [openDropdowns, setOpenDropdowns] = useState<Set<string>>(new Set());
   const [newProject, setNewProject] = useState(false);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  });
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleResize = () => {
     setIsMobile(window.innerWidth < 1040);
   };
+
+  const registerDropdown = useCallback((id: string, isOpen: boolean) => {
+    setOpenDropdowns(prev => {
+      const next = new Set(prev);
+      if (isOpen) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }, []);
+
+  const isDropdownOpen = openDropdowns.size > 0;
 
   return (
     <Context.Provider
@@ -49,6 +61,8 @@ const ContextProvider = ({ children }: ProviderProps) => {
         setIsMobile,
         isOpen,
         setIsOpen,
+        isDropdownOpen,
+        registerDropdown,
         newProject,
         setNewProject,
       }}

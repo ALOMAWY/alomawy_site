@@ -1,8 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, memo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { keyframes } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { 
+  faStar, 
+  faSpinner, 
+  faChevronDown, 
+  faLayerGroup, 
+  faGlobe, 
+  faGamepad, 
+  faCode, 
+  faChartPie, 
+  faMobileAlt 
+} from "@fortawesome/free-solid-svg-icons";
 import { useMyContext } from "./Context";
 import { getProjectTypeStyle } from "../utils";
 
@@ -38,27 +48,27 @@ const Styled_Portfolio = styled.div`
 const Categories = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: center;
   color: #fff;
   width: fit-content;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(20px);
   padding: 8px;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 0 auto;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0 auto 3rem auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 
-  @media (max-width: 991px) {
-    width: 95%;
-    gap: 0.5rem;
+  @media (max-width: 900px) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: calc(100% - 2rem);
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
     padding: 6px;
-  }
-
-  @media (max-width: 485px) {
-    flex-wrap: wrap;
-    border-radius: 16px;
+    gap: 6px;
   }
 `;
 
@@ -66,30 +76,52 @@ const CategoryItem = styled.div<{ $active?: boolean; $isCount?: boolean }>`
   cursor: pointer;
   padding: 10px 20px;
   font-size: 0.8rem;
-  font-weight: 900;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+  letter-spacing: 1px;
+  border-radius: 30px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
   background: ${props => props.$active ? 'var(--main-color)' : 'transparent'};
-  color: ${props => props.$active ? '#fff' : 'rgba(255, 255, 255, 0.5)'};
-  box-shadow: ${props => props.$active ? '0 8px 20px -5px rgba(var(--main-color-rgb), 0.5)' : 'none'};
+  color: ${props => props.$active ? '#fff' : 'rgba(255, 255, 255, 0.6)'};
+  border: 1px solid ${props => props.$active ? 'rgba(255, 255, 255, 0.2)' : 'transparent'};
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    padding: 12px 6px;
+    border-radius: 12px;
+    font-size: 0.6rem;
+    gap: 6px;
+    letter-spacing: 0;
+    
+    background: ${props => props.$active ? 'rgba(var(--main-color-rgb), 0.2)' : 'rgba(255, 255, 255, 0.03)'};
+    color: ${props => props.$active ? 'var(--main-color)' : 'rgba(255, 255, 255, 0.5)'};
+    border-color: ${props => props.$active ? 'rgba(var(--main-color-rgb), 0.4)' : 'rgba(255, 255, 255, 0.05)'};
+    
+    svg {
+      font-size: 1.1rem;
+      opacity: ${props => props.$active ? '1' : '0.5'};
+    }
+  }
 
   ${props => props.$isCount && `
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--main-color);
-    padding-left: 20px;
-    margin-left: 10px;
     cursor: default;
-    border-radius: 0;
-    
-    @media (max-width: 485px) {
-      border-left: none;
-      width: 100%;
-      text-align: center;
-      margin-left: 0;
-      padding: 5px;
+    @media (max-width: 900px) {
+      grid-column: span 3;
+      padding: 6px;
+      font-size: 0.8rem;
+      flex-direction: row;
+      background: transparent;
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 0;
     }
   `}
 
@@ -97,12 +129,7 @@ const CategoryItem = styled.div<{ $active?: boolean; $isCount?: boolean }>`
     ${props => !props.$active && !props.$isCount && `
       background: rgba(255, 255, 255, 0.05);
       color: #fff;
-      transform: translateY(-2px);
     `}
-  }
-
-  &:active {
-    transform: scale(0.95);
   }
 `;
 
@@ -114,8 +141,8 @@ const NoItemsMessage = styled.h1`
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 3px;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   padding: 3rem 4rem;
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -223,23 +250,20 @@ const Portfolio = () => {
 
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
   const [category, setCategory] = useState<string>("all");
+
   const categoriesList = [
-    { text: t("portfolio.category.all"), value: "all" },
-    { text: t("portfolio.category.website"), value: "website" },
-    { text: t("portfolio.category.game"), value: "game" },
-    { text: t("portfolio.category.simple"), value: "simple" },
-    { text: t("portfolio.category.dashboard"), value: "dashboard" },
-    { text: t("portfolio.category.app"), value: "app" },
+    { text: t("portfolio.category.all"), value: "all", icon: faLayerGroup },
+    { text: t("portfolio.category.website"), value: "website", icon: faGlobe },
+    { text: t("portfolio.category.game"), value: "game", icon: faGamepad },
+    { text: t("portfolio.category.simple"), value: "simple", icon: faCode },
+    { text: t("portfolio.category.dashboard"), value: "dashboard", icon: faChartPie },
+    { text: t("portfolio.category.app"), value: "app", icon: faMobileAlt },
   ];
 
   const filteredProjects = useMemo(() => {
-    if (category === "all") {
-      return projects;
-    } else {
-      return projects.filter((pr) => pr.type == category);
-    }
+    if (category === "all") return projects;
+    return projects.filter((pr) => pr.type == category);
   }, [category, projects]);
 
   const handleFetchingData = async () => {
@@ -247,12 +271,9 @@ const Portfolio = () => {
     try {
       const response = await fetch(`${API_URL}/api/projects`);
       if (!response.ok) throw new Error('Failed to fetch projects');
-      const data = await response.json();
-      setProjects(data);
+      setProjects(await response.json());
     } catch (error) {
-      // Error fetching data
     } finally {
-      // Small timeout to ensure transition is smooth and not too jarring
       setTimeout(() => setLoading(false), 500);
     }
   };
@@ -270,6 +291,7 @@ const Portfolio = () => {
             $active={category === cate.value}
             onClick={() => setCategory(cate.value)}
           >
+            <FontAwesomeIcon icon={cate.icon} />
             {cate.text}
           </CategoryItem>
         ))}
@@ -326,12 +348,16 @@ const Rate = ({ rate, color }: { rate: string; color: string }) => {
 const StyledCard = styled.div<{ $color: string; $accent: string }>`
   width: 100%;
   position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(25px);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  @media (max-width: 768px) {
+    backdrop-filter: blur(4px);
+    padding: 16px;
+  }
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 40px;
   overflow: hidden;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   display: flex;
   flex-direction: column;
   padding: 24px;
@@ -513,7 +539,7 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
   }
 `;
 
-const Card = ({ project }: any) => {
+const Card = memo(({ project }: any) => {
   const { t } = useTranslation();
 
   const {
@@ -536,7 +562,7 @@ const Card = ({ project }: any) => {
   return (
     <StyledCard $color={color} $accent={accentBg}>
       <div className="image-container">
-        <img src={projectImage || "./assets/project-placeholder.png"} alt="Project" />
+        <img src={projectImage || "./assets/project-placeholder.png"} alt="Project" loading="lazy" />
       </div>
 
       <div className="content">
@@ -588,6 +614,6 @@ const Card = ({ project }: any) => {
       </div>
     </StyledCard>
   );
-};
+});
 
 export default Portfolio;

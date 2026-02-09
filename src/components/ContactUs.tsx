@@ -28,6 +28,7 @@ const StyledContactUs = styled.div`
 
   @media (max-width: 1040px) {
     flex-direction: column-reverse;
+    padding:1rem;
   }
 `;
 
@@ -182,6 +183,10 @@ const ContactForm = styled.form`
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 40px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+  @media (max-width: 1040px) {
+    padding:1rem;
+  } 
 
   .input {
     display: flex;

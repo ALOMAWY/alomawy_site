@@ -18,7 +18,11 @@
     },
     "numbers": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
     "fullname": "Abdalrahman Aldabbas",
-    "loading": "loading..."
+    "loading": "loading...",
+    "change_theme": "Change Theme",
+    "change_lang": "Change Language",
+    "download": "Download App",
+    "about": "Project Info"
   },
   "path": {
     "home": "Home",
@@ -135,6 +139,8 @@
     "edit_project": "Edit project",
     "manage_projects": "Manage projects",
     "actions": "Actions",
+    "page_label": "Page",
+    "tools_label": "Tools",
     "edit": "Edit",
     "delete": "Delete",
     "save": "Save changes",

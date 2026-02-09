@@ -38,9 +38,13 @@ export const handleSetTheme = (color: string, change?: boolean): void => {
 
   // document.body.style.backgroundImage = `url(./imgs/backgrounds/Background_${nextColor}.png)`;
   document.body.style.backgroundImage = `url("./backgrounds/Background_${nextColor}.png")`;
-  const themeFile = document.createElement("style");
-
-  document.head.appendChild(themeFile);
+  
+  let themeFile = document.getElementById("theme-style");
+  if (!themeFile) {
+    themeFile = document.createElement("style");
+    themeFile.id = "theme-style";
+    document.head.appendChild(themeFile);
+  }
 
   switch (nextColor) {
     case "red":

@@ -47,6 +47,8 @@ const StyledAboutUs = styled.div`
 
     @media (max-width: 900px) {
       max-width: 100%;
+      padding:0.25rem;
+      
     }
 
     > div {

@@ -19,65 +19,80 @@ const Holder = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid var(--secondary-color);
+  padding: 0.5rem 1.5rem;
 `;
 
 const Buttons_List = styled.ul`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 10px;
-  overflow: hidden;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
 `;
 
 export const Navigation_Button = styled.li`
-  padding: 5px;
-  min-width: 50px;
-  max-width: 160px;
-  height: 50px;
-  transition: 0.4s;
+  min-width: 44px;
+  height: 44px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
 
   button {
     text-transform: uppercase;
+    font-weight: 900;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 0 1rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   svg {
-    color: var(--secondary-color);
+    color: #fff;
+    opacity: 0.7;
+    transition: all 0.3s ease;
   }
 
   &:hover {
-    color: var(--secondary-color);
-    transform: scale(1.2);
-    background-color: var(--background-main-color);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--main-color);
+    transform: translateY(-2px);
+    
+    svg {
+      color: var(--main-color);
+      opacity: 1;
+      transform: scale(1.1);
+    }
   }
 
   &::before {
-    content: "";
-    width: 100%;
-    height: 100%;
-    border: 1px solid var(--main-color);
-    border-radius: 5px;
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    transition: 0.4s;
-  }
-
-  &:hover::before {
-    transform: rotate3d(4, 3, 4, 360deg);
+    display: none; /* Removed old spinning border */
   }
 
   a {
     position: relative;
     z-index: 2;
-    width: 100%;
+    padding: 0 1.25rem;
     height: 100%;
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    font-weight: 900;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: #fff;
+    }
   }
 `;
 

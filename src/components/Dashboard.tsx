@@ -31,8 +31,13 @@ const Styled_Form = styled.form`
   flex-direction: column;
   gap: 2rem;
   padding: 3rem;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(24px);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
+  @media (max-width: 768px) {
+    backdrop-filter: blur(4px);
+    padding: 1.5rem;
+    border-radius: 24px;
+  }
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 40px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
@@ -260,8 +265,11 @@ const Styled_Form = styled.form`
 const StyledTable = styled.div`
   margin-top: 6rem;
   padding: 3rem;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(30px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(16px);
+  @media (max-width: 768px) {
+    backdrop-filter: blur(4px);
+  }
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 48px;
   color: #fff;
@@ -432,9 +440,9 @@ const StyledTable = styled.div`
     thead { display: none; }
 
     tr {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(40px);
-      border-radius: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
       padding: 1.5rem;
       margin-bottom: 2rem;
       border: 1px solid rgba(255, 255, 255, 0.08);

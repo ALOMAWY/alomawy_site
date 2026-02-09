@@ -42,6 +42,7 @@ const HeroSection = styled.div`
     flex-direction: column-reverse;
     text-align: center;
     gap: 2rem;
+    padding-top:50px;
   }
 `;
 

@@ -2,22 +2,22 @@ import styled from "styled-components";
 import { Navigation_Button } from "./ActionsNavbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useMyContext } from "./Context";
 import { useTranslation } from "react-i18next";
 
 const Styled_LinksNavbar = styled.nav`
-  width: 100%;
+  width: 100%;    padding: 0.5rem 1.5rem;
+}
 `;
 const Styled_LinksList = styled.ul`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   width: 100%;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 0.75rem;
+  padding: 0.5rem 1.5rem;
   overflow: hidden;
-  border-bottom: 1px solid var(--main-color);
 
   li {
     color: #fff;
@@ -27,6 +27,10 @@ const Styled_LinksList = styled.ul`
 const LinksNavbar = () => {
   const { isList, setIsList, setIsOpen } = useMyContext();
   const { t } = useTranslation();
+
+  const params = useParams()
+
+  console.log(params)
 
   return (
     <Styled_LinksNavbar className={isList ? "translate-x-r" : ""}>
