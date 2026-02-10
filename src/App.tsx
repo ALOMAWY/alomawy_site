@@ -21,6 +21,22 @@ import ScrollToTop from "./components/ScrollToTop";
 import AdminForm from "./components/AdminForm";
 import { useMyContext } from "./components/Context";
 
+const Holder = styled.div<{ $isMobile: boolean; $headerHeight: number }>`
+  min-height: ${(props) =>
+    !props.$isMobile
+      ? `calc(100vh - ${props.$headerHeight}px)`
+      : "min-content"};
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  > * {
+    width: 100%;
+  }
+`;
+
 function App() {
   const [headerSize, setHeaderSize] = useState<{
     width: number;
@@ -36,21 +52,6 @@ function App() {
   // Test--
 
   const headerRef = useRef<HTMLDivElement>(null);
-
-  const Holder = styled.div`
-    min-height: ${!isMobile
-      ? `calc(100vh - ${headerSize.height}px)`
-      : "min-content"};
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    > * {
-      width: 100%;
-    }
-  `;
 
   useEffect(() => {
     if (headerRef.current) {
@@ -89,7 +90,7 @@ function App() {
             <Route
               path="/"
               element={
-                <Holder>
+                <Holder $isMobile={isMobile} $headerHeight={headerSize.height}>
                   <Landing />
                 </Holder>
               }
@@ -97,7 +98,7 @@ function App() {
             <Route
               path="/services"
               element={
-                <Holder>
+                <Holder $isMobile={isMobile} $headerHeight={headerSize.height}>
                   <Services />
                 </Holder>
               }
@@ -105,7 +106,7 @@ function App() {
             <Route
               path="/portfolio"
               element={
-                <Holder>
+                <Holder $isMobile={isMobile} $headerHeight={headerSize.height}>
                   <Portfolio />
                 </Holder>
               }
@@ -114,7 +115,7 @@ function App() {
             <Route
               path="/contact_us"
               element={
-                <Holder>
+                <Holder $isMobile={isMobile} $headerHeight={headerSize.height}>
                   <ContactUs />
                 </Holder>
               }
@@ -122,7 +123,7 @@ function App() {
             <Route
               path="/about_us"
               element={
-                <Holder>
+                <Holder $isMobile={isMobile} $headerHeight={headerSize.height}>
                   <AboutUs />
                 </Holder>
               }
@@ -130,7 +131,7 @@ function App() {
             <Route
               path="/social_media"
               element={
-                <Holder>
+                <Holder $isMobile={isMobile} $headerHeight={headerSize.height}>
                   <Socials />
                 </Holder>
               }
@@ -138,7 +139,7 @@ function App() {
             <Route
               path="/dash"
               element={
-                <Holder
+                <Holder $isMobile={isMobile} $headerHeight={headerSize.height}
                   style={{
                     minHeight: `calc(100vh - ${headerSize.height}px) `,
                     display: "flex",
