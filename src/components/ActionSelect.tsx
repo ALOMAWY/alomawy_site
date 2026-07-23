@@ -1,4 +1,4 @@
-import { faPuzzlePiece, faChevronDown, faBrush, faLanguage, faDownload, faCircleInfo } from "@fortawesome/free-solid-svg-icons";
+import { faPuzzlePiece, faChevronDown, faBrush, faLanguage, faDownload, faCircleInfo, faGaugeHigh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { handleChangeLang, handleSetTheme } from "../utils";
 import { getItemFromLocalStorage } from "../utils/localStorage";
 import { useMyContext } from "./Context";
+import { QualityLevel } from "../utils/quality";
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(-10px); }
@@ -20,7 +21,7 @@ const DropdownWrapper = styled.div`
 const Styled_MenuButton = styled.button<{ $isOpen: boolean }>`
   min-width: 140px;
   height: 44px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--q-transition-speed) var(--q-transition-ease);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -58,7 +59,7 @@ const Styled_MenuButton = styled.button<{ $isOpen: boolean }>`
     color: #fff;
     opacity: 0.6;
     font-size: 0.7rem;
-    transition: transform 0.3s ease;
+    transition: transform var(--q-transition-speed) var(--q-transition-ease);
     transform: ${props => props.$isOpen ? 'rotate(180deg)' : 'rotate(0)'};
   }
 
@@ -81,12 +82,12 @@ const DropdownMenu = styled.div<{ $dir: string }>`
   ${props => props.$dir === 'rtl' ? 'right: 0;' : 'left: 0;'}
   width: 220px;
   background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(20px);
+  backdrop-filter: var(--q-blur-dropdown);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 0.75rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  animation: ${fadeIn} 0.2s ease-out forwards;
+  animation: ${fadeIn} var(--q-transition-speed) ease-out forwards;
   z-index: 10002;
   display: flex;
   flex-direction: column;
@@ -110,13 +111,13 @@ const DropdownItem = styled.div`
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  transition: all 0.2s ease;
+  transition: all var(--q-transition-speed) var(--q-transition-ease);
 
   svg {
     width: 16px;
     opacity: 0.5;
     color: #fff;
-    transition: all 0.2s ease;
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
   }
 
   &:hover {
@@ -131,7 +132,7 @@ const ActionSelect = () => {
   const [isDropdownReady, setIsDropdownReady] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { i18n, t } = useTranslation();
-  const { registerDropdown } = useMyContext();
+  const { registerDropdown, qualityLevel, setQualityLevel } = useMyContext();
 
   // Sync global state
   useEffect(() => {
@@ -167,10 +168,17 @@ const ActionSelect = () => {
       case 'lang':
         handleChangeLang(i18n);
         break;
+      case 'quality':
+        const cycle: QualityLevel[] = ["low", "medium", "high"];
+        const idx = cycle.indexOf(qualityLevel);
+        setQualityLevel(cycle[(idx + 1) % cycle.length]);
+        break;
       default:
         break;
     }
   };
+
+  const qualityLabel = t(`info.quality_${qualityLevel}`) || qualityLevel.charAt(0).toUpperCase() + qualityLevel.slice(1);
 
   return (
     <DropdownWrapper ref={dropdownRef}>
@@ -207,6 +215,10 @@ const ActionSelect = () => {
           <DropdownItem onClick={() => { if (isDropdownReady) setLocalIsOpen(false); }}>
             <FontAwesomeIcon icon={faCircleInfo} />
             {t("info.about") || "Project Info"}
+          </DropdownItem>
+          <DropdownItem onClick={() => { if (isDropdownReady) { handleAction('quality'); setLocalIsOpen(false); } }}>
+            <FontAwesomeIcon icon={faGaugeHigh} />
+            {t("info.quality") || "Quality"}: {qualityLabel}
           </DropdownItem>
         </DropdownMenu>
       )}

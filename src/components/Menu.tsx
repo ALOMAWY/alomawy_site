@@ -6,6 +6,7 @@ import {
   faBrush,
   faCircleInfo,
   faDownload,
+  faGaugeHigh,
   faLanguage,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
@@ -13,6 +14,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { handleChangeLang, handleSetTheme } from "../utils";
 import { getItemFromLocalStorage } from "../utils/localStorage";
+import { QualityLevel } from "../utils/quality";
 
 const Styled_Menu = styled.div`
   width: 100vw;
@@ -26,7 +28,7 @@ const Styled_Menu = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(6px);
+  backdrop-filter: var(--q-blur-menu);
 
   .close-btn {
     position: absolute;
@@ -46,7 +48,13 @@ const Styled_Menu = styled.div`
 `;
 
 const Menu = () => {
-  const { isList, isOpen, setIsOpen } = useMyContext();
+  const { isList, isOpen, setIsOpen, qualityLevel, setQualityLevel } = useMyContext();
+
+  const cycleQuality = () => {
+    const cycle: QualityLevel[] = ["low", "medium", "high"];
+    const idx = cycle.indexOf(qualityLevel);
+    setQualityLevel(cycle[(idx + 1) % cycle.length]);
+  };
 
   const { i18n, t } = useTranslation();
   return (
@@ -77,6 +85,11 @@ const Menu = () => {
           </Navigation_Button>
           <Navigation_Button className={isList ? "translate-x-r-5" : ""}>
             <Link to="/social_media">{t("sections.social_media")}</Link>
+          </Navigation_Button>
+          <Navigation_Button className={isList ? "translate-x-r-6" : ""} onClick={cycleQuality}>
+            <button>
+              <FontAwesomeIcon icon={faGaugeHigh} />
+            </button>
           </Navigation_Button>
         </ul>
       ) : (
@@ -114,6 +127,11 @@ const Menu = () => {
           <Navigation_Button className="translate-x-l-4">
             <button>
               <FontAwesomeIcon icon={faCircleInfo} />
+            </button>
+          </Navigation_Button>
+          <Navigation_Button className="translate-x-l-5" onClick={cycleQuality}>
+            <button>
+              <FontAwesomeIcon icon={faGaugeHigh} />
             </button>
           </Navigation_Button>
         </ul>

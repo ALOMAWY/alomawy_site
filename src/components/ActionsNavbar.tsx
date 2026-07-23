@@ -2,6 +2,7 @@ import {
   faBrush,
   faCircleInfo,
   faDownload,
+  faGaugeHigh,
   faLanguage,
   faList,
 } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +13,7 @@ import Name from "./Name";
 import { useTranslation } from "react-i18next";
 import { handleChangeLang, handleSetTheme } from "../utils";
 import { getItemFromLocalStorage } from "../utils/localStorage";
+import { QualityLevel } from "../utils/quality";
 
 const Styled_Navbar = styled.nav``;
 
@@ -32,7 +34,7 @@ const Buttons_List = styled.ul`
 export const Navigation_Button = styled.li`
   min-width: 44px;
   height: 44px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--q-transition-speed) var(--q-transition-ease);
   position: relative;
   display: flex;
   align-items: center;
@@ -57,7 +59,7 @@ export const Navigation_Button = styled.li`
   svg {
     color: #fff;
     opacity: 0.7;
-    transition: all 0.3s ease;
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
   }
 
   &:hover {
@@ -88,7 +90,7 @@ export const Navigation_Button = styled.li`
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: rgba(255, 255, 255, 0.7);
-    transition: all 0.3s ease;
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
 
     &:hover {
       color: #fff;
@@ -97,8 +99,14 @@ export const Navigation_Button = styled.li`
 `;
 
 const ActionsNavbar = () => {
-  const { isList, setIsList } = useMyContext();
-  const { i18n } = useTranslation();
+  const { isList, setIsList, qualityLevel, setQualityLevel } = useMyContext();
+  const { i18n, t } = useTranslation();
+
+  const cycleQuality = () => {
+    const cycle: QualityLevel[] = ["low", "medium", "high"];
+    const idx = cycle.indexOf(qualityLevel);
+    setQualityLevel(cycle[(idx + 1) % cycle.length]);
+  };
 
   return (
     <Holder className={!isList ? "translate-x-l" : ""}>
@@ -135,6 +143,12 @@ const ActionsNavbar = () => {
           <Navigation_Button className="theme-btn">
             <button>
               <FontAwesomeIcon icon={faCircleInfo} />
+            </button>
+          </Navigation_Button>
+
+          <Navigation_Button className="theme-btn" onClick={cycleQuality} title={`${t("info.quality") || "Quality"}: ${t(`info.quality_${qualityLevel}`) || qualityLevel}`}>
+            <button>
+              <FontAwesomeIcon icon={faGaugeHigh} />
             </button>
           </Navigation_Button>
 
