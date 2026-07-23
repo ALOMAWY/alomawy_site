@@ -10,6 +10,93 @@ html {
   --background-white-color: rgba(255, 255, 255, 0.1);
   --background-color: #000c14;
 }
+
+/* === Quality Level CSS Custom Properties === */
+
+html.quality-high {
+  --q-blur-body: blur(3px);
+  --q-blur-header: blur(12px);
+  --q-blur-header-mobile: blur(8px);
+  --q-blur-dropdown: blur(20px);
+  --q-blur-card: blur(10px);
+  --q-blur-card-sm: blur(5px);
+  --q-blur-form: blur(15px);
+  --q-blur-form-lg: blur(24px);
+  --q-blur-footer: blur(25px);
+  --q-blur-footer-logo: blur(20px);
+  --q-blur-menu: blur(6px);
+  --q-blur-scrollbar: blur(4px);
+  --q-blur-dashboard: blur(12px);
+  --q-blur-dashboard-sm: blur(4px);
+  --q-blur-dashboard-mobile: blur(10px);
+  --q-blur-no-items: blur(10px);
+  --q-blur-loader: blur(10px);
+  --q-blur-badge: blur(10px);
+  --q-blur-skill: blur(5px);
+  --q-blur-image: blur(20px);
+  --q-blur-table: blur(16px);
+  --q-transition-speed: 0.3s;
+  --q-transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --q-animation-play: running;
+  --q-transform-hover: translateY(-2px);
+}
+
+html.quality-medium {
+  --q-blur-body: blur(1px);
+  --q-blur-header: blur(4px);
+  --q-blur-header-mobile: blur(4px);
+  --q-blur-dropdown: blur(8px);
+  --q-blur-card: blur(4px);
+  --q-blur-card-sm: blur(2px);
+  --q-blur-form: blur(6px);
+  --q-blur-form-lg: blur(10px);
+  --q-blur-footer: blur(8px);
+  --q-blur-footer-logo: blur(8px);
+  --q-blur-menu: blur(3px);
+  --q-blur-scrollbar: blur(2px);
+  --q-blur-dashboard: blur(4px);
+  --q-blur-dashboard-sm: blur(4px);
+  --q-blur-dashboard-mobile: blur(4px);
+  --q-blur-no-items: blur(4px);
+  --q-blur-loader: blur(4px);
+  --q-blur-badge: blur(4px);
+  --q-blur-skill: blur(2px);
+  --q-blur-image: blur(8px);
+  --q-blur-table: blur(6px);
+  --q-transition-speed: 0.15s;
+  --q-transition-ease: ease;
+  --q-animation-play: running;
+  --q-transform-hover: translateY(-1px);
+}
+
+html.quality-low {
+  --q-blur-body: none;
+  --q-blur-header: none;
+  --q-blur-header-mobile: none;
+  --q-blur-dropdown: none;
+  --q-blur-card: none;
+  --q-blur-card-sm: none;
+  --q-blur-form: none;
+  --q-blur-form-lg: none;
+  --q-blur-footer: none;
+  --q-blur-footer-logo: none;
+  --q-blur-menu: none;
+  --q-blur-scrollbar: none;
+  --q-blur-dashboard: none;
+  --q-blur-dashboard-sm: none;
+  --q-blur-dashboard-mobile: none;
+  --q-blur-no-items: none;
+  --q-blur-loader: none;
+  --q-blur-badge: none;
+  --q-blur-skill: none;
+  --q-blur-image: none;
+  --q-blur-table: none;
+  --q-transition-speed: 0s;
+  --q-transition-ease: ease;
+  --q-animation-play: paused;
+  --q-transform-hover: none;
+}
+
 * {
   padding: 0px;
   margin: 0px;
@@ -33,9 +120,7 @@ body {
   font-family: "Anta", sans-serif;
   font-weight: 400;
   font-style: normal;
-  /* user-select: none; */
-  /* Reduced blur for mobile performance */
-  backdrop-filter: blur(3px);
+  backdrop-filter: var(--q-blur-body);
 }
 
 ::selection{
@@ -43,9 +128,8 @@ background-color: var(--background-main-color);
 color: var(--secondary-color);
 }
 
-/* Specific transitions instead of global * transition */
 button, a, .option label, .field, .category-badge, .tag {
-  transition: 0.3s ease;
+  transition: var(--q-transition-speed) var(--q-transition-ease);
 }
 
 button {
@@ -78,8 +162,8 @@ a {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: var(--q-blur-scrollbar);
+  -webkit-backdrop-filter: var(--q-blur-scrollbar);
 }
 
 ::-webkit-scrollbar-thumb:hover {
