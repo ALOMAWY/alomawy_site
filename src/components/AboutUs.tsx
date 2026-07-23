@@ -34,7 +34,7 @@ const StyledAboutUs = styled.div`
     border-radius: 35px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(15px);
+    backdrop-filter: var(--q-blur-form);
     padding: 1.5rem;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -112,7 +112,7 @@ const StyledAboutUs = styled.div`
         font-size: 0.85rem;
         font-weight: 700;
         color: var(--main-color);
-        transition: all 0.3s ease;
+        transition: all var(--q-transition-speed) var(--q-transition-ease);
         cursor: default;
 
         &:hover {
@@ -151,6 +151,7 @@ const AnimationArea = styled.div`
     opacity: 0.8;
     box-shadow: 0 0 50px rgba(var(--main-color-rgb), 0.5);
     animation: ball-animation 8s ease-in-out infinite alternate;
+    animation-play-state: var(--q-animation-play);
 
     @media (max-width: 1100px) {
       width: 200px;

@@ -53,7 +53,7 @@ const Categories = styled.div`
   color: #fff;
   width: fit-content;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
+  backdrop-filter: var(--q-blur-dropdown);
   padding: 8px;
   border-radius: 40px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -80,7 +80,7 @@ const CategoryItem = styled.div<{ $active?: boolean; $isCount?: boolean }>`
   text-transform: uppercase;
   letter-spacing: 1px;
   border-radius: 30px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--q-transition-speed) var(--q-transition-ease);
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -142,7 +142,7 @@ const NoItemsMessage = styled.h1`
   text-transform: uppercase;
   letter-spacing: 3px;
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  backdrop-filter: var(--q-blur-no-items);
   padding: 3rem 4rem;
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -199,10 +199,11 @@ const LoaderContainer = styled.div`
       height: 100%;
       background: rgba(var(--main-color-rgb), 0.15);
       border: 2px solid rgba(var(--main-color-rgb), 0.4);
-      backdrop-filter: blur(10px);
+      backdrop-filter: var(--q-blur-loader);
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(var(--main-color-rgb), 0.2);
       animation: square-anim 1.5s infinite ease-in-out;
+      animation-play-state: var(--q-animation-play);
 
       &:nth-child(1) { animation-delay: 0s; }
       &:nth-child(2) { animation-delay: 0.2s; }
@@ -349,15 +350,15 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
   width: 100%;
   position: relative;
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--q-blur-card);
   @media (max-width: 768px) {
-    backdrop-filter: blur(4px);
+    backdrop-filter: var(--q-blur-dashboard-sm);
     padding: 16px;
   }
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 40px;
   overflow: hidden;
-  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  transition: transform var(--q-transition-speed) var(--q-transition-ease), border-color var(--q-transition-speed) var(--q-transition-ease), box-shadow var(--q-transition-speed) var(--q-transition-ease);
   display: flex;
   flex-direction: column;
   padding: 24px;
@@ -397,6 +398,7 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
       height: 100%;
       object-fit: cover;
       transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      animation-play-state: var(--q-animation-play);
     }
   }
 
@@ -458,7 +460,7 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
     text-transform: uppercase;
     letter-spacing: 1px;
     color: ${props => props.$color};
-    transition: all 0.3s ease;
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
 
     &:hover {
       background: ${props => props.$color}20;
@@ -518,7 +520,7 @@ const StyledCard = styled.div<{ $color: string; $accent: string }>`
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 2px;
-      transition: all 0.3s ease;
+      transition: all var(--q-transition-speed) var(--q-transition-ease);
       text-align: center;
       text-decoration: none;
       font-size: 0.8rem;

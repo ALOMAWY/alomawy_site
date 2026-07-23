@@ -19,7 +19,7 @@ const DropdownWrapper = styled.div`
 const Styled_MenuButton = styled.button<{ $isOpen: boolean }>`
   min-width: 140px;
   height: 44px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--q-transition-speed) var(--q-transition-ease);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -57,7 +57,7 @@ const Styled_MenuButton = styled.button<{ $isOpen: boolean }>`
     color: #fff;
     opacity: 0.6;
     font-size: 0.7rem;
-    transition: transform 0.3s ease;
+    transition: transform var(--q-transition-speed) var(--q-transition-ease);
     transform: ${props => props.$isOpen ? 'rotate(180deg)' : 'rotate(0)'};
   }
 
@@ -80,12 +80,12 @@ const DropdownMenu = styled.div<{ $dir: string }>`
   ${props => props.$dir === 'rtl' ? 'left: 0;' : 'right: 0;'}
   width: 220px;
   background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(20px);
+  backdrop-filter: var(--q-blur-dropdown);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 0.75rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  animation: ${fadeIn} 0.2s ease-out forwards;
+  animation: ${fadeIn} var(--q-transition-speed) ease-out forwards;
   z-index: 10002;
   display: flex;
   flex-direction: column;
@@ -110,7 +110,7 @@ const DropdownItem = styled(Link)<{ $active: boolean }>`
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  transition: all 0.2s ease;
+  transition: all var(--q-transition-speed) var(--q-transition-ease);
 
   svg {
     width: 16px;

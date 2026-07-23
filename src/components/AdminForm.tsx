@@ -27,13 +27,14 @@ const StyledForm = styled.form<{ $error?: boolean }>`
   gap: 1.5rem;
   padding: 2.5rem;
   border: 1px solid rgba(var(--main-color-rgb), 0.3);
-  backdrop-filter: blur(15px);
+  backdrop-filter: var(--q-blur-form);
   background: rgba(0, 0, 0, 0.4);
   border-radius: 20px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   animation: ${fadeIn} 0.6s ease-out;
+  animation-play-state: var(--q-animation-play);
   ${props => props.$error && css`animation: ${shake} 0.3s ease-in-out;`}
-  transition: all 0.3s ease;
+  transition: all var(--q-transition-speed) var(--q-transition-ease);
 
   h1 {
     color: #fff;
@@ -53,7 +54,7 @@ const StyledForm = styled.form<{ $error?: boolean }>`
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
 
     &:focus-within {
       border-color: var(--main-color);
@@ -69,7 +70,7 @@ const StyledForm = styled.form<{ $error?: boolean }>`
       svg {
         color: var(--main-color);
         font-size: 1.1rem;
-        transition: transform 0.3s ease;
+        transition: transform var(--q-transition-speed) var(--q-transition-ease);
       }
     }
 
@@ -103,7 +104,7 @@ const StyledForm = styled.form<{ $error?: boolean }>`
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -262,7 +263,7 @@ const AdminForm = () => {
             width: '25px',
             color: 'var(--main-color)',
             opacity: 0.6,
-            transition: 'all 0.3s ease'
+            transition: 'all var(--q-transition-speed) var(--q-transition-ease)'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.opacity = '1';

@@ -179,7 +179,7 @@ const ContactForm = styled.form`
   gap: 2rem;
   padding: 3rem;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(24px);
+  backdrop-filter: var(--q-blur-form-lg);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 40px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
@@ -196,7 +196,7 @@ const ContactForm = styled.form`
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 20px;
-    transition: all 0.3s ease;
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
 
     &:focus-within {
       background: rgba(255, 255, 255, 0.06);
@@ -226,7 +226,7 @@ const ContactForm = styled.form`
         color: var(--main-color);
         opacity: 0.6;
         font-size: 1.1rem;
-        transition: all 0.3s ease;
+        transition: all var(--q-transition-speed) var(--q-transition-ease);
       }
     }
 
@@ -262,7 +262,7 @@ const ContactForm = styled.form`
     color: #fff;
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(var(--main-color-rgb), 0.3);
-    transition: all 0.3s ease;
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
 
     &:hover {
       transform: translateY(-2px);

@@ -31,7 +31,7 @@ const Styled_Footer = styled.footer`
   border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
   padding: 4rem 2rem;
   background: rgba(0, 12, 20, 0.7);
-  backdrop-filter: blur(25px);
+  backdrop-filter: var(--q-blur-footer);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -87,7 +87,7 @@ const Styled_Footer = styled.footer`
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 20px;
-        transition: all 0.3s ease;
+        transition: all var(--q-transition-speed) var(--q-transition-ease);
         width: 100%;
 
         &:hover {
@@ -135,7 +135,7 @@ const Styled_Footer = styled.footer`
             color: #fff;
             font-weight: 600;
             word-break: break-word;
-            transition: color 0.3s ease;
+            transition: color var(--q-transition-speed) var(--q-transition-ease);
             
             &.email {
               text-transform: lowercase;
@@ -175,10 +175,11 @@ const Styled_Footer = styled.footer`
         background: rgba(255, 255, 255, 0.03);
         border: 2px solid rgba(var(--main-color-rgb), 0.3);
         border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-        backdrop-filter: blur(20px);
+        backdrop-filter: var(--q-blur-footer-logo);
         position: relative;
         overflow: hidden;
         animation: ${float} 6s ease-in-out infinite, ${glow} 4s ease-in-out infinite;
+        animation-play-state: var(--q-animation-play);
         transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
         img {
@@ -259,6 +260,7 @@ const Styled_Footer = styled.footer`
           color: #fff;
           font-size: 1.4rem;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          animation-play-state: var(--q-animation-play);
 
           /* Staircase Effect & Individual Hover */
           &:nth-child(1) { transform: translateY(0px); }
@@ -311,7 +313,7 @@ const Styled_Footer = styled.footer`
           color: rgba(255, 255, 255, 0.6);
           text-transform: uppercase;
           letter-spacing: 1px;
-          transition: 0.3s;
+          transition: var(--q-transition-speed) var(--q-transition-ease);
 
           &:hover {
             color: var(--main-color);

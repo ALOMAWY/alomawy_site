@@ -25,6 +25,7 @@ const Styled_Name = styled.h3`
     height: 1em;
     background: var(--main-color);
     animation: blink 0.8s infinite;
+    animation-play-state: var(--q-animation-play);
     margin-left: 4px;
   }
 

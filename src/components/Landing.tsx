@@ -63,7 +63,7 @@ const TextArea = styled.section`
     text-transform: uppercase;
     letter-spacing: 2px;
     border: 1px solid rgba(var(--main-color-rgb), 0.3);
-    backdrop-filter: blur(10px);
+    backdrop-filter: var(--q-blur-badge);
 
     @media (max-width: 991px) {
       margin: 0 auto;
@@ -119,9 +119,9 @@ const TextArea = styled.section`
       color: #fff;
       font-size: 0.85rem;
       font-weight: 600;
-      transition: all 0.3s ease;
+      transition: all var(--q-transition-speed) var(--q-transition-ease);
       cursor: default;
-      backdrop-filter: blur(5px);
+      backdrop-filter: var(--q-blur-skill);
 
       &:hover {
         background: var(--main-color);
@@ -159,10 +159,11 @@ const ImageContainer = styled.div`
   border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   background: rgba(255, 255, 255, 0.03);
   border: 2px solid rgba(var(--main-color-rgb), 0.3);
-  backdrop-filter: blur(20px);
+  backdrop-filter: var(--q-blur-image);
   position: relative;
   overflow: hidden;
   animation: ${float} 6s ease-in-out infinite, ${glow} 4s ease-in-out infinite;
+  animation-play-state: var(--q-animation-play);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
@@ -196,6 +197,7 @@ const BackgroundElement = styled.div<{ $top: string; $left: string; $size: strin
   z-index: 1;
   filter: blur(40px);
   animation: ${float} 8s ease-in-out infinite;
+  animation-play-state: var(--q-animation-play);
   animation-delay: ${props => props.$delay};
 `;
 

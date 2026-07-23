@@ -36,17 +36,18 @@ const Styled_Service = styled.div`
   flex-direction: column;
   height: 250px;
   padding: 10px;
-  transition: 0.3s ease;
+  transition: var(--q-transition-speed) var(--q-transition-ease);
   width: calc(100% - 1rem);
   
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
+  backdrop-filter: var(--q-blur-card);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 20px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 
   animation: serv 3s linear;
   animation-timeline: view(200px 40px);
+  animation-play-state: var(--q-animation-play);
 
   @media (max-width: 991px) {
     width: 90%;
@@ -57,7 +58,7 @@ const Styled_Service = styled.div`
       font-size: 1.6rem;
       color: var(--main-color);
       opacity: 0.8;
-      transition: 0.3s ease;
+      transition: var(--q-transition-speed) var(--q-transition-ease);
     }
   }
 

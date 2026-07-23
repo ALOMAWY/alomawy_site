@@ -32,9 +32,9 @@ const Styled_Form = styled.form`
   gap: 2rem;
   padding: 3rem;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--q-blur-dashboard);
   @media (max-width: 768px) {
-    backdrop-filter: blur(4px);
+    backdrop-filter: var(--q-blur-dashboard-sm);
     padding: 1.5rem;
     border-radius: 24px;
   }
@@ -97,7 +97,7 @@ const Styled_Form = styled.form`
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 20px;
-      transition: all 0.3s ease;
+      transition: all var(--q-transition-speed) var(--q-transition-ease);
 
       &:focus-within {
         background: rgba(255, 255, 255, 0.06);
@@ -164,7 +164,7 @@ const Styled_Form = styled.form`
           font-weight: 900;
           text-transform: uppercase;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all var(--q-transition-speed) var(--q-transition-ease);
           opacity: 0.4;
         }
 
@@ -204,7 +204,7 @@ const Styled_Form = styled.form`
     text-transform: uppercase;
     letter-spacing: 0.3em;
     box-shadow: 0 10px 20px rgba(var(--main-color-rgb), 0.3);
-    transition: all 0.3s ease;
+    transition: all var(--q-transition-speed) var(--q-transition-ease);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
@@ -266,9 +266,9 @@ const StyledTable = styled.div`
   margin-top: 6rem;
   padding: 3rem;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(16px);
+  backdrop-filter: var(--q-blur-table);
   @media (max-width: 768px) {
-    backdrop-filter: blur(4px);
+    backdrop-filter: var(--q-blur-dashboard-sm);
   }
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 48px;
@@ -327,7 +327,7 @@ const StyledTable = styled.div`
       padding: 1.25rem 1rem;
       font-size: 0.9rem;
       background: rgba(255, 255, 255, 0.02);
-      transition: all 0.3s ease;
+      transition: all var(--q-transition-speed) var(--q-transition-ease);
       vertical-align: middle;
       
       &:first-child { border-radius: 16px 0 0 16px; }
@@ -390,7 +390,7 @@ const StyledTable = styled.div`
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.05);
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--q-transition-speed) var(--q-transition-ease);
         border-radius: 12px;
         font-size: 0.9rem;
 
@@ -441,7 +441,7 @@ const StyledTable = styled.div`
 
     tr {
       background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
+      backdrop-filter: var(--q-blur-dashboard-mobile);
       border-radius: 20px;
       padding: 1.5rem;
       margin-bottom: 2rem;
@@ -537,7 +537,7 @@ const StyledTable = styled.div`
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 16px;
           color: #fff;
-          transition: all 0.3s ease;
+          transition: all var(--q-transition-speed) var(--q-transition-ease);
 
           &.edit { color: #3498db; }
           &.delete { color: #e74c3c; }

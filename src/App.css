@@ -80,59 +80,73 @@
 .translate-x-r {
   transform: translateX(100%);
   animation: x-direction 0.3s 1 ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-r-1 {
   transform: translateX(1000%);
   animation: x-direction 0.5s 0.5s 1 ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-r-2 {
   transform: translateX(1000%);
   animation: x-direction 0.5s 1 0.6s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-r-3 {
   transform: translateX(1000%);
   animation: x-direction 0.5s 1 0.7s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-r-4 {
   transform: translateX(1000%);
   animation: x-direction 0.5s 1 0.8s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-r-5 {
   transform: translateX(1000%);
   animation: x-direction 0.5s 1 0.9s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-r-6 {
   transform: translateX(1000%);
   animation: x-direction 0.5s 1 0.1s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-l {
   transform: translateX(-100%);
   animation: x-direction 0.5s 1 ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 
 .translate-x-l-1 {
   transform: translateX(-1100%);
   animation: x-direction 0.5s 0.5s 1 ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-l-2 {
   transform: translateX(-1100%);
   animation: x-direction 0.5s 1 0.6s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-l-3 {
   transform: translateX(-1100%);
   animation: x-direction 0.5s 1 0.7s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-l-4 {
   transform: translateX(-1100%);
   animation: x-direction 0.5s 1 0.8s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-l-5 {
   transform: translateX(-1100%);
   animation: x-direction 0.5s 1 0.9s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 .translate-x-l-6 {
   transform: translateX(-1100%);
   animation: x-direction 0.5s 1 0.1s ease-in-out forwards;
+  animation-play-state: var(--q-animation-play);
 }
 
 @keyframes x-direction {

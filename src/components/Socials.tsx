@@ -69,7 +69,7 @@ const Socials = () => {
 const Styled_Social = styled.div`
   width: 100%;
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
+  backdrop-filter: var(--q-blur-card);
   border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
@@ -82,7 +82,7 @@ const Styled_Social = styled.div`
   position: relative;
   border-radius: 20px;
   padding: 2rem 1.5rem;
-  transition: all 0.3s ease;
+  transition: all var(--q-transition-speed) var(--q-transition-ease);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 
   &:hover {
@@ -152,7 +152,7 @@ const Styled_Social = styled.div`
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: 0.3s;
+    transition: var(--q-transition-speed) var(--q-transition-ease);
 
     &:hover {
       background: rgba(255, 255, 255, 0.08);
@@ -180,7 +180,7 @@ const Styled_Social = styled.div`
     font-weight: bold;
     text-transform: uppercase;
     font-size: 0.9rem;
-    transition: 0.3s;
+    transition: var(--q-transition-speed) var(--q-transition-ease);
     margin-top: auto;
     color: #fff;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);

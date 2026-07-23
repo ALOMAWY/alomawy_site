@@ -9,7 +9,7 @@ import ActionSelect from "./ActionSelect";
 
 const HeaderWrapper = styled.div`
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--q-blur-header);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   width: 100%;
   position: relative;
@@ -17,7 +17,7 @@ const HeaderWrapper = styled.div`
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 
   @media (max-width: 768px) {
-    backdrop-filter: blur(8px);
+    backdrop-filter: var(--q-blur-header-mobile);
     background: rgba(0, 0, 0, 0.7);
   }
 `;
