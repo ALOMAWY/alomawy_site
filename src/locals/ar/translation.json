@@ -22,7 +22,11 @@
     "change_theme": "تغيير المظهر",
     "change_lang": "تغيير اللغة",
     "download": "تحميل التطبيق",
-    "about": "معلومات المشروع"
+    "about": "معلومات المشروع",
+    "quality": "الجودة",
+    "quality_low": "منخفض",
+    "quality_medium": "متوسط",
+    "quality_high": "عالي"
   },
   "path": {
     "home": "الرئيسية",

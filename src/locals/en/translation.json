@@ -22,7 +22,11 @@
     "change_theme": "Change Theme",
     "change_lang": "Change Language",
     "download": "Download App",
-    "about": "Project Info"
+    "about": "Project Info",
+    "quality": "Quality",
+    "quality_low": "Low",
+    "quality_medium": "Medium",
+    "quality_high": "High"
   },
   "path": {
     "home": "Home",
