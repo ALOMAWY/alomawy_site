@@ -1,19 +1,24 @@
-import mongoose from 'mongoose';
+import { createClient } from '@supabase/supabase-js';
 
-const projectSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  developer: { type: String, required: true },
-  source: { type: String, required: true },
-  visit: { type: String },
-  disc: { type: String, required: true },
-  rate: { type: String, default: "20" },
-  image: { type: String }, // Path or URL
-  langs: [{ type: String }],
-  techs: [{ type: String }],
-  type: { type: String, required: true },
-  date: { type: String }, // Custom date string (e.g., "Feb 2024")
-  createdAt: { type: Date, default: Date.now },
-});
+let _supabase = null;
 
-const Project = mongoose.model('Project', projectSchema);
-export default Project;
+function getClient() {
+  if (!_supabase) {
+    _supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+  }
+  return _supabase;
+}
+
+const TABLE = 'projects';
+
+function mapProject(row) {
+  if (!row) return null;
+  const { id, created_at, ...rest } = row;
+  return { _id: id, createdAt: created_at, ...rest };
+}
+
+function mapProjects(rows) {
+  return rows.map(mapProject);
+}
+
+export { getClient, TABLE, mapProject, mapProjects };
