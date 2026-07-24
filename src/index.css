@@ -93,7 +93,7 @@ html.quality-low {
   --q-blur-table: none;
   --q-transition-speed: 0s;
   --q-transition-ease: ease;
-  --q-animation-play: paused;
+  --q-animation-play: running;
   --q-transform-hover: none;
 }
 
