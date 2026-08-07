@@ -8,10 +8,12 @@ interface Project {
   title: string;
   developer: string;
   type: string;
+  types?: string[];
   rate: string;
   techs: string[];
   langs: string[];
   image?: string;
+  images?: string[];
   visit?: string;
   disc?: string;
   source?: string;
@@ -163,7 +165,10 @@ const AdminOverview = ({ projects }: AdminOverviewProps) => {
     : "0";
 
   const typeCounts = projects.reduce((acc, p) => {
-    acc[p.type] = (acc[p.type] || 0) + 1;
+    const projectTypes = p.types || (p.type ? [p.type] : []);
+    for (const ty of projectTypes) {
+      acc[ty] = (acc[ty] || 0) + 1;
+    }
     return acc;
   }, {} as Record<string, number>);
   const topType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
@@ -174,7 +179,7 @@ const AdminOverview = ({ projects }: AdminOverviewProps) => {
   }, {} as Record<string, number>);
   const topTech = Object.entries(techCounts).sort((a, b) => b[1] - a[1])[0];
 
-  const withImage = projects.filter(p => p.image).length;
+  const withImage = projects.filter(p => p.image || (p.images && p.images.length > 0)).length;
   const withLink = projects.filter(p => p.visit).length;
 
   const recentProjects = [...projects]

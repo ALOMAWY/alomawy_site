@@ -12,10 +12,12 @@ interface Project {
   title: string;
   developer: string;
   type: string;
+  types?: string[];
   rate: string;
   techs: string[];
   langs: string[];
   image?: string;
+  images?: string[];
   visit?: string;
   disc?: string;
   source?: string;
@@ -185,11 +187,14 @@ const AdminStatistics = ({ projects }: AdminStatisticsProps) => {
     const dateSet = new Set<string>();
 
     for (const p of projects) {
-      typeCounts[p.type] = (typeCounts[p.type] || 0) + 1;
+      const projectTypes = p.types || (p.type ? [p.type] : []);
+      for (const ty of projectTypes) {
+        typeCounts[ty] = (typeCounts[ty] || 0) + 1;
+      }
       totalRating += +p.rate || 0;
       totalTechs += p.techs?.length || 0;
       totalDescLen += (p.disc || "").length;
-      if (p.image) withImage++;
+      if (p.image || (p.images && p.images.length > 0)) withImage++;
       if (p.visit) withVisit++;
 
       for (const lang of p.langs || []) {
@@ -223,9 +228,11 @@ const AdminStatistics = ({ projects }: AdminStatisticsProps) => {
         dateSet.add(monthKey);
       }
 
-      if (!ratingByType[p.type]) ratingByType[p.type] = { sum: 0, count: 0 };
-      ratingByType[p.type].sum += +p.rate || 0;
-      ratingByType[p.type].count++;
+      for (const ty of (p.types || [p.type])) {
+        if (!ratingByType[ty]) ratingByType[ty] = { sum: 0, count: 0 };
+        ratingByType[ty].sum += +p.rate || 0;
+        ratingByType[ty].count++;
+      }
     }
 
     for (const p of sorted) {

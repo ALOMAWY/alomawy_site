@@ -264,7 +264,10 @@ const Portfolio = () => {
 
   const filteredProjects = useMemo(() => {
     if (category === "all") return projects;
-    return projects.filter((pr) => pr.type == category);
+    return projects.filter((pr) => {
+      const projectTypes = pr.types || (pr.type ? [pr.type] : []);
+      return projectTypes.includes(category);
+    });
   }, [category, projects]);
 
   const handleFetchingData = async () => {
@@ -546,9 +549,7 @@ const Card = memo(({ project }: any) => {
 
   const {
     title,
-    image,
     developer,
-    type,
     source,
     disc,
     techs,
@@ -557,9 +558,12 @@ const Card = memo(({ project }: any) => {
     visit,
   } = project;
 
-  const { color, accentBg } = getProjectTypeStyle(type);
+  const projectTypes: string[] = project.types || (project.type ? [project.type] : []);
+  const primaryType = projectTypes[0] || "";
+  const { color, accentBg } = getProjectTypeStyle(primaryType);
 
-  const projectImage = image?.startsWith('/uploads') ? `${API_URL}${image}` : image;
+  const projectImages: string[] = project.images || (project.image ? [project.image] : []);
+  const projectImage = projectImages[0]?.startsWith('/uploads') ? `${API_URL}${projectImages[0]}` : projectImages[0];
 
   return (
     <StyledCard $color={color} $accent={accentBg}>
@@ -599,7 +603,7 @@ const Card = memo(({ project }: any) => {
 
           <div className="info-item">
             <span className="label">{t("portfolio.type")}</span>
-            <span className="value">{t(`portfolio.category.${type}`)}</span>
+            <span className="value">{projectTypes.map((ty: string) => t(`portfolio.category.${ty}`)).join(", ")}</span>
           </div>
 
           <div className="info-item">
