@@ -11,10 +11,36 @@ function getClient() {
 
 const TABLE = 'projects';
 
+function parseJSONArray(value, fallback = []) {
+  if (!value) return fallback;
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : fallback;
+    } catch {
+      return value ? [value] : fallback;
+    }
+  }
+  return fallback;
+}
+
 function mapProject(row) {
   if (!row) return null;
-  const { id, created_at, ...rest } = row;
-  return { _id: id, createdAt: created_at, ...rest };
+  const { id, created_at, type, image, ...rest } = row;
+
+  const types = parseJSONArray(type, type ? [type] : []);
+  const images = parseJSONArray(image, image ? [image] : []);
+
+  return {
+    _id: id,
+    createdAt: created_at,
+    type: types[0] || '',
+    types,
+    image: images[0] || '',
+    images,
+    ...rest,
+  };
 }
 
 function mapProjects(rows) {

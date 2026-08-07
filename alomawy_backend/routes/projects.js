@@ -44,12 +44,38 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get unique sources
+router.get('/sources', async (req, res) => {
+  try {
+    const { data, error } = await getClient()
+      .from(TABLE)
+      .select('source')
+      .not('source', 'is', null)
+      .neq('source', '');
+
+    if (error) throw error;
+    const unique = [...new Set(data.map((r) => r.source))].sort();
+    res.json(unique);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Add a new project
-router.post('/', upload.single('image'), async (req, res) => {
-  const { title, developer, source, visit, disc, rate, langs, techs, type, date } = req.body;
+router.post('/', upload.array('images', 10), async (req, res) => {
+  const { title, developer, source, visit, disc, rate, langs, techs, types, type, date } = req.body;
 
   const parsedLangs = typeof langs === 'string' ? JSON.parse(langs) : langs;
   const parsedTechs = typeof techs === 'string' ? JSON.parse(techs) : techs;
+
+  let parsedTypes;
+  if (types) {
+    parsedTypes = typeof types === 'string' ? JSON.parse(types) : types;
+  } else {
+    parsedTypes = type ? [type] : [];
+  }
+
+  const imageUrls = req.files ? req.files.map((f) => f.path) : [];
 
   const projectData = {
     title,
@@ -60,9 +86,9 @@ router.post('/', upload.single('image'), async (req, res) => {
     rate,
     langs: parsedLangs || [],
     techs: parsedTechs || [],
-    type,
+    type: JSON.stringify(parsedTypes),
     date,
-    image: req.file ? req.file.path : '',
+    image: JSON.stringify(imageUrls),
   };
 
   try {
@@ -80,10 +106,10 @@ router.post('/', upload.single('image'), async (req, res) => {
 });
 
 // Update a project
-router.put('/:id', upload.single('image'), async (req, res) => {
+router.put('/:id', upload.array('images', 10), async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, developer, source, visit, disc, rate, langs, techs, type, date } = req.body;
+    const { title, developer, source, visit, disc, rate, langs, techs, types, type, date, existingImages } = req.body;
 
     const { data: existing, error: findError } = await getClient()
       .from(TABLE)
@@ -95,11 +121,27 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    const updateData = { title, developer, source, visit, disc, rate, type, date };
+    const updateData = { title, developer, source, visit, disc, rate, date };
+
+    let parsedTypes;
+    if (types) {
+      parsedTypes = typeof types === 'string' ? JSON.parse(types) : types;
+    } else if (type) {
+      parsedTypes = [type];
+    }
+    if (parsedTypes) updateData.type = JSON.stringify(parsedTypes);
 
     if (langs) updateData.langs = typeof langs === 'string' ? JSON.parse(langs) : langs;
     if (techs) updateData.techs = typeof techs === 'string' ? JSON.parse(techs) : techs;
-    if (req.file) updateData.image = req.file.path;
+
+    let keptImages = [];
+    if (existingImages) {
+      keptImages = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+    }
+    const newImageUrls = req.files ? req.files.map((f) => f.path) : [];
+    if (existingImages !== undefined || req.files) {
+      updateData.image = JSON.stringify([...keptImages, ...newImageUrls]);
+    }
 
     const { data, error } = await getClient()
       .from(TABLE)
