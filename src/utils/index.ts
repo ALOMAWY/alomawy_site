@@ -131,20 +131,27 @@ export const calculate = (date: string): string => {
     ? `${years}-Years , ${months}-Months, ${days}-Days `
     : `${years} سنة و ${months} أشهر و ${days} يوم `;
 };
-export const getProjectTypeStyle = (type: string) => {
-  switch (type) {
-    case "website":
-      return { color: "#3498db", accentBg: "rgba(52, 152, 219, 0.1)" };
-    case "game":
-      return { color: "#9b59b6", accentBg: "rgba(155, 89, 182, 0.1)" };
-    case "simple":
-      return { color: "#2ecc71", accentBg: "rgba(46, 204, 113, 0.1)" };
-    case "dashboard":
-      return { color: "#f1c40f", accentBg: "rgba(241, 196, 15, 0.1)" };
-    case "app":
-      return { color: "#e91e63", accentBg: "rgba(233, 30, 99, 0.1)" };
-    default:
-      return { color: "#3498db", accentBg: "rgba(52, 152, 219, 0.1)" };
-  }
-};
 
+export const ALL_PROJECT_TYPES = [
+  "website", "game", "simple", "dashboard", "app",
+  "api", "library", "mobile", "landing", "ecommerce", "blog", "portfolio", "other",
+];
+
+export const getProjectTypeStyle = (type: string) => {
+  const styles: Record<string, { color: string; accentBg: string }> = {
+    website: { color: "#3498db", accentBg: "rgba(52, 152, 219, 0.1)" },
+    game: { color: "#9b59b6", accentBg: "rgba(155, 89, 182, 0.1)" },
+    simple: { color: "#2ecc71", accentBg: "rgba(46, 204, 113, 0.1)" },
+    dashboard: { color: "#f1c40f", accentBg: "rgba(241, 196, 15, 0.1)" },
+    app: { color: "#e91e63", accentBg: "rgba(233, 30, 99, 0.1)" },
+    api: { color: "#00bcd4", accentBg: "rgba(0, 188, 212, 0.1)" },
+    library: { color: "#ff5722", accentBg: "rgba(255, 87, 34, 0.1)" },
+    mobile: { color: "#8bc34a", accentBg: "rgba(139, 195, 74, 0.1)" },
+    landing: { color: "#607d8b", accentBg: "rgba(96, 125, 139, 0.1)" },
+    ecommerce: { color: "#ff9800", accentBg: "rgba(255, 152, 0, 0.1)" },
+    blog: { color: "#795548", accentBg: "rgba(121, 85, 72, 0.1)" },
+    portfolio: { color: "#673ab7", accentBg: "rgba(103, 58, 187, 0.1)" },
+    other: { color: "#9e9e9e", accentBg: "rgba(158, 158, 158, 0.1)" },
+  };
+  return styles[type] || styles.other;
+};

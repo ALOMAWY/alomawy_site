@@ -140,6 +140,7 @@
     "visit_link": "Visit link:",
     "disc": "Description:",
     "projectImage": "Project image",
+    "projectImages": "Project Images",
     "edit_project": "Edit project",
     "manage_projects": "Manage projects",
     "actions": "Actions",
@@ -155,7 +156,21 @@
     "uploadingImage": "Uploading Image...",
     "add": "Add Project",
     "check_fields": "Please check all fields.",
-    "confirm_delete": "Are you sure you want to delete this project?"
+    "confirm_delete": "Are you sure you want to delete this project?",
+    "crop_confirm": "Crop & Add",
+    "tech": {
+      "languages": "Languages",
+      "frameworks": "Frameworks & Libraries",
+      "styling": "Styling",
+      "buildTools": "Build Tools",
+      "codeQuality": "Code Quality",
+      "runtime": "Runtime",
+      "databases": "Databases",
+      "baas": "Backend as a Service",
+      "api": "API",
+      "devops": "DevOps",
+      "tools": "Tools"
+    }
   },
   "admin": {
     "success": "Success!",
@@ -186,7 +201,8 @@
     "sort_newest": "Newest",
     "sort_oldest": "Oldest",
     "sort_rated": "Highest Rated",
-    "sort_alpha": "Alphabetical"
+    "sort_alpha": "Alphabetical",
+    "select_source": "Select source..."
   },
   "portfolio": {
     "developer": "Developer:",
@@ -206,7 +222,15 @@
       "game": "Games",
       "simple": "Simple projects",
       "dashboard": "Dashboards",
-      "app": "Apps"
+      "app": "Apps",
+      "api": "API",
+      "library": "Library",
+      "mobile": "Mobile",
+      "landing": "Landing",
+      "ecommerce": "E-Commerce",
+      "blog": "Blog",
+      "portfolio": "Portfolio",
+      "other": "Other"
     }
   },
   "footer": {

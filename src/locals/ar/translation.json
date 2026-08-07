@@ -155,7 +155,22 @@
     "uploadingImage": "جارٍ رفع الصورة...",
     "add": "إضافة مشروع",
     "check_fields": "يرجى التحقق من جميع الحقول.",
-    "confirm_delete": "هل أنت متأكد أنك تريد حذف هذا المشروع؟"
+    "confirm_delete": "هل أنت متأكد أنك تريد حذف هذا المشروع؟",
+    "crop_recrop": "قص وإضافة",
+    "projectImages": "صور المشروع",
+    "tech": {
+      "languages": "اللغات",
+      "frameworks": "الأطر والمكتبات",
+      "styling": "التنسيق",
+      "buildTools": "أدوات البناء",
+      "codeQuality": "جودة الكود",
+      "runtime": "بيئة التشغيل",
+      "databases": "قواعد البيانات",
+      "baas": "الخدمة كنافذة خلفية",
+      "api": "واجهة برمجة التطبيقات",
+      "devops": "عمليات التطوير",
+      "tools": "الأدوات"
+    }
   },
   "admin": {
     "success": "تم بنجاح!",
@@ -186,7 +201,8 @@
     "sort_newest": "الأحدث",
     "sort_oldest": "الأقدم",
     "sort_rated": "الأعلى تقييماً",
-    "sort_alpha": "أبجدي"
+    "sort_alpha": "أبجدي",
+    "select_source": "اختر المصدر..."
   },
   "portfolio": {
     "developer": "المطور:",
@@ -206,7 +222,15 @@
       "game": "الألعاب",
       "simple": "أعمال بسيطة",
       "dashboard": "لوحات التحكم",
-      "app": "التطبيقات"
+      "app": "التطبيقات",
+      "api": "واجهة برمجة",
+      "library": "مكتبة",
+      "mobile": "محمول",
+      "landing": "صفحة هبوط",
+      "ecommerce": "تجارة إلكترونية",
+      "blog": "مدونة",
+      "portfolio": "معرض أعمال",
+      "other": "أخرى"
     }
   },
   "footer": {
