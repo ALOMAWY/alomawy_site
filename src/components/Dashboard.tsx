@@ -14,37 +14,56 @@ import {
   faSave,
   faTimes,
   faRightFromBracket,
-  faChartLine,
+  faChartBar,
   faFolderOpen,
   faGear,
-  faChartBar,
   faSearch,
   faFilter,
   faArrowDownShortWide,
+  faXmark,
+  faCropSimple,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { signOut } from "../redux/adminSign";
 import { useMyContext } from "./Context";
-import { getProjectTypeStyle } from "../utils";
+import { getProjectTypeStyle, ALL_PROJECT_TYPES } from "../utils";
 import AdminOverview from "./AdminOverview";
 import AdminStatistics from "./AdminStatistics";
 import AdminSettings from "./AdminSettings";
+import Cropper from "react-easy-crop";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+const techCategories = {
+  frontend: {
+    languages: ["html", "css", "javascript", "typescript"],
+    frameworks: ["react", "vue", "angular", "nextjs", "redux", "zustand", "reactRouter", "formik", "yup", "axios"],
+    styling: ["sass", "bootstrap", "tailwind", "styled-components"],
+    buildTools: ["vite", "webpack", "gulp"],
+    codeQuality: ["eslint", "prettier"],
+  },
+  backend: {
+    runtime: ["nodejs"],
+    frameworks: ["express", "nestjs"],
+    databases: ["mongodb", "postgresql", "mysql", "redis"],
+    baas: ["firebase", "supabase"],
+    api: ["graphql", "rest"],
+    devops: ["docker", "git", "github", "gitlab", "ci/cd"],
+    tools: ["npm", "yarn", "postman", "figma"],
+  },
+};
+
+const languages = ["arabic", "english"];
 
 const PanelWrapper = styled.div`
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1.5rem;
-
-  @media (max-width: 768px) {
-    padding: 0 0.75rem;
-    margin: 1rem auto;
-  }
+  @media (max-width: 768px) { padding: 0 0.75rem; margin: 1rem auto; }
 `;
 
 const PanelHeader = styled.div`
@@ -54,503 +73,245 @@ const PanelHeader = styled.div`
   margin-bottom: 2rem;
   gap: 1rem;
   flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .header-title {
-    font-size: 1.2rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #fff;
-  }
-
+  @media (max-width: 768px) { flex-direction: column; align-items: stretch; }
+  .header-title { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #fff; }
   .logout-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: rgba(231, 76, 60, 0.15);
-    border: 1px solid rgba(231, 76, 60, 0.3);
-    border-radius: 12px;
-    color: #e74c3c;
-    font-weight: 800;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all var(--q-transition-speed) var(--q-transition-ease);
-    white-space: nowrap;
-
-    &:hover {
-      background: rgba(231, 76, 60, 0.25);
-      border-color: #e74c3c;
-    }
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;
+    background: rgba(231, 76, 60, 0.15); border: 1px solid rgba(231, 76, 60, 0.3);
+    border-radius: 12px; color: #e74c3c; font-weight: 800; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+    transition: all var(--q-transition-speed) var(--q-transition-ease); white-space: nowrap;
+    &:hover { background: rgba(231, 76, 60, 0.25); border-color: #e74c3c; }
   }
 `;
 
 const TabBar = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: var(--q-blur-dashboard);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
-  padding: 6px;
-  margin-bottom: 2rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-
+  display: flex; gap: 0.5rem; background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: var(--q-blur-dashboard); border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px; padding: 6px; margin-bottom: 2rem; overflow-x: auto; scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
-
-  @media (max-width: 768px) {
-    backdrop-filter: var(--q-blur-dashboard-sm);
-  }
+  @media (max-width: 768px) { backdrop-filter: var(--q-blur-dashboard-sm); }
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
-  flex: 1;
-  min-width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.85rem 1.25rem;
-  border-radius: 14px;
-  border: 1px solid transparent;
-  background: ${props => props.$active ? 'rgba(var(--main-color-rgb), 0.15)' : 'transparent'};
-  border-color: ${props => props.$active ? 'rgba(var(--main-color-rgb), 0.3)' : 'transparent'};
-  color: ${props => props.$active ? 'var(--main-color)' : 'rgba(255,255,255,0.4)'};
-  font-size: 0.7rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all var(--q-transition-speed) var(--q-transition-ease);
-  white-space: nowrap;
-
-  svg {
-    font-size: 0.85rem;
-  }
-
+  flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 0.85rem 1.25rem; border-radius: 14px; border: 1px solid transparent;
+  background: ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.15)' : 'transparent'};
+  border-color: ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.3)' : 'transparent'};
+  color: ${p => p.$active ? 'var(--main-color)' : 'rgba(255,255,255,0.4)'};
+  font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+  cursor: pointer; transition: all var(--q-transition-speed) var(--q-transition-ease); white-space: nowrap;
+  svg { font-size: 0.85rem; }
   &:hover:not([disabled]) {
-    background: ${props => props.$active ? 'rgba(var(--main-color-rgb), 0.2)' : 'rgba(255,255,255,0.05)'};
-    color: ${props => props.$active ? 'var(--main-color)' : 'rgba(255,255,255,0.6)'};
+    background: ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.2)' : 'rgba(255,255,255,0.05)'};
+    color: ${p => p.$active ? 'var(--main-color)' : 'rgba(255,255,255,0.6)'};
   }
-
-  @media (max-width: 768px) {
-    min-width: 70px;
-    padding: 0.7rem 0.75rem;
-    font-size: 0.6rem;
-    gap: 0.35rem;
-  }
+  @media (max-width: 768px) { min-width: 70px; padding: 0.7rem 0.75rem; font-size: 0.6rem; gap: 0.35rem; }
 `;
 
 const TabContent = styled.div`
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: var(--q-blur-dashboard);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 32px;
-  padding: 2rem;
-  color: #fff;
-
-  @media (max-width: 768px) {
-    backdrop-filter: var(--q-blur-dashboard-sm);
-    padding: 1rem;
-    border-radius: 24px;
-  }
+  background: rgba(0, 0, 0, 0.5); backdrop-filter: var(--q-blur-dashboard);
+  border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 32px; padding: 2rem; color: #fff;
+  @media (max-width: 768px) { backdrop-filter: var(--q-blur-dashboard-sm); padding: 1rem; border-radius: 24px; }
 `;
 
 const Styled_Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-
-  .header {
-    text-align: center;
-    margin-bottom: 1rem;
-
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      opacity: 0.9;
-    }
-
-    .line {
-      width: 60px;
-      height: 4px;
-      background: var(--main-color);
-      margin: 1rem auto;
-      border-radius: 2px;
-      opacity: 0.5;
-    }
+  display: flex; flex-direction: column; gap: 2rem;
+  .header { text-align: center; margin-bottom: 1rem;
+    h2 { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.9; }
+    .line { width: 60px; height: 4px; background: var(--main-color); margin: 1rem auto; border-radius: 2px; opacity: 0.5; }
   }
-
-  .grid-section {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-
-    label {
-      font-size: 0.7rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.4;
-      margin-left: 1rem;
-    }
-
-    .field {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 1.5rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      transition: all var(--q-transition-speed) var(--q-transition-ease);
-
-      &:focus-within {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: var(--main-color);
-        box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.2);
-      }
-
+  .grid-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; @media (max-width: 768px) { grid-template-columns: 1fr; } }
+  .input-group { display: flex; flex-direction: column; gap: 0.75rem;
+    label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; margin-left: 1rem; }
+    .field { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px; transition: all var(--q-transition-speed) var(--q-transition-ease);
+      &:focus-within { background: rgba(255, 255, 255, 0.06); border-color: var(--main-color); box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.2); }
       svg { color: var(--main-color); opacity: 0.6; }
-
-      input, textarea, select {
-        flex: 1;
-        background: transparent;
-        border: none;
-        outline: none;
-        color: #fff;
-        font-size: 0.9rem;
-        &::placeholder { opacity: 0.2; }
-      }
+      input, textarea, select { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 0.9rem; &::placeholder { opacity: 0.2; } }
+      select { cursor: pointer; option { background: #1a1a2e; color: #fff; } }
     }
   }
-
-  .selection-box {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
-    padding: 1.5rem;
-    height: 100%;
-
-    .title {
-      font-size: 0.7rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.4;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      svg { color: var(--main-color); }
-    }
-
-    .options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-
-      .option {
-        position: relative;
-        label {
-          display: block;
-          padding: 8px 16px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid transparent;
-          border-radius: 12px;
-          font-size: 0.7rem;
-          font-weight: 900;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: all var(--q-transition-speed) var(--q-transition-ease);
-          opacity: 0.4;
-        }
+  .selection-box { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px; padding: 1.5rem; height: 100%;
+    .title { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4;
+      margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; svg { color: var(--main-color); } }
+    .options { display: flex; flex-wrap: wrap; gap: 0.75rem;
+      .option { position: relative;
+        label { display: block; padding: 8px 16px; background: rgba(255, 255, 255, 0.05);
+          border: 1px solid transparent; border-radius: 12px; font-size: 0.7rem; font-weight: 900;
+          text-transform: uppercase; cursor: pointer; transition: all var(--q-transition-speed) var(--q-transition-ease); opacity: 0.4; }
         input { display: none; }
-        input:checked + label {
-          background: rgba(var(--main-color-rgb), 0.2);
-          border-color: var(--main-color);
-          opacity: 1;
-          box-shadow: 0 4px 12px rgba(var(--main-color-rgb), 0.1);
-        }
+        input:checked + label { background: rgba(var(--main-color-rgb), 0.2); border-color: var(--main-color); opacity: 1;
+          box-shadow: 0 4px 12px rgba(var(--main-color-rgb), 0.1); }
         &:hover label { opacity: 0.8; background: rgba(255, 255, 255, 0.08); }
       }
     }
   }
-
-  .image-upload-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    align-items: center;
+  .tech-category { margin-bottom: 1.25rem;
+    &:last-child { margin-bottom: 0; }
+    .cat-label { font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px;
+      opacity: 0.3; color: var(--main-color); margin-bottom: 0.75rem; padding-left: 0.25rem; }
   }
-
-  button[type="submit"] {
-    margin-top: 1rem;
-    padding: 1.5rem;
-    background: var(--main-color);
-    border-radius: 24px;
-    font-weight: 900;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
+  .image-upload-container { display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start; }
+  .images-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .image-thumb { position: relative; border-radius: 16px; overflow: hidden; width: 200px; height: 112px;
+    border: 1px solid rgba(255,255,255,0.1); cursor: pointer;
+    img { width: 100%; height: 100%; object-fit: cover; }
+    .image-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex;
+      align-items: center; justify-content: center; gap: 0.5rem; opacity: 0; transition: opacity 0.2s; }
+    &:hover .image-overlay { opacity: 1; }
+    .image-overlay button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.1); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; font-size: 0.75rem;
+      &:hover { background: rgba(255,255,255,0.2); }
+      &.delete-btn:hover { background: rgba(231, 76, 60, 0.3); border-color: #e74c3c; color: #e74c3c; }
+    }
+  }
+  .crop-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.85);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+  .crop-container { position: relative; width: 100%; max-width: 600px; height: 337px; border-radius: 16px; overflow: hidden; }
+  .crop-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+  .crop-actions button { padding: 0.75rem 2rem; border-radius: 12px; font-weight: 800; font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 1px solid transparent;
+    transition: all 0.2s; }
+  .crop-actions .confirm { background: var(--main-color); color: #fff; border-color: var(--main-color);
+    &:hover { filter: brightness(1.1); } }
+  .crop-actions .cancel { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2);
+    &:hover { background: rgba(255,255,255,0.15); } }
+  .rate-display { text-align: center; font-size: 1.5rem; font-weight: 900; color: var(--main-color);
+    margin-bottom: 0.5rem; }
+  button[type="submit"] { margin-top: 1rem; padding: 1.5rem; background: var(--main-color); border-radius: 24px;
+    font-weight: 900; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.3em;
     box-shadow: 0 10px 20px rgba(var(--main-color-rgb), 0.3);
     transition: all var(--q-transition-speed) var(--q-transition-ease);
-
     &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(var(--main-color-rgb), 0.4); filter: brightness(1.1); }
     &:active:not(:disabled) { transform: translateY(0); }
-    &:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-  }
-
+    &:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); } }
   @media (max-width: 768px) {
     .header h2 { font-size: 1.2rem; }
-    .input-group {
-      label { margin-left: 0; justify-content: center; display: flex; }
-    }
+    .input-group label { margin-left: 0; justify-content: center; display: flex; }
     .selection-box .title { justify-content: center; }
     .selection-box .options { justify-content: center; }
     .selection-box.image-upload-container { justify-content: center; }
     .image-upload-container { justify-content: center; }
     .grid-section { grid-template-columns: 1fr; }
+    .image-thumb { width: 150px; height: 84px; }
   }
 `;
 
 const StyledTable = styled.div`
-  margin-top: 2rem;
-  overflow: hidden;
-
-  h3 {
-    text-align: center;
-    margin-bottom: 2rem;
-    font-size: 1rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
-    opacity: 0.8;
-    color: var(--main-color);
-  }
-
-  .toolbar {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-
-    .search-box {
-      flex: 1;
-      min-width: 200px;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1.25rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
-      transition: all var(--q-transition-speed) var(--q-transition-ease);
-
+  margin-top: 2rem; overflow: hidden;
+  h3 { text-align: center; margin-bottom: 2rem; font-size: 1rem; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.3em; opacity: 0.8; color: var(--main-color); }
+  .toolbar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+    .search-box { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1.25rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; transition: all var(--q-transition-speed) var(--q-transition-ease);
       svg { color: var(--main-color); opacity: 0.5; font-size: 0.85rem; }
-
-      input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        outline: none;
-        color: #fff;
-        font-size: 0.8rem;
-        &::placeholder { opacity: 0.25; }
-      }
-
-      &:focus-within {
-        border-color: var(--main-color);
-        box-shadow: 0 0 12px rgba(var(--main-color-rgb), 0.15);
-      }
+      input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 0.8rem; &::placeholder { opacity: 0.25; } }
+      &:focus-within { border-color: var(--main-color); box-shadow: 0 0 12px rgba(var(--main-color-rgb), 0.15); }
     }
-
-    .filter-select, .sort-select {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: all var(--q-transition-speed) var(--q-transition-ease);
-
+    .filter-select, .sort-select { display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.25rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; color: rgba(255,255,255,0.6); font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px; transition: all var(--q-transition-speed) var(--q-transition-ease);
       svg { color: var(--main-color); opacity: 0.5; font-size: 0.75rem; }
-
-      select {
-        background: transparent;
-        border: none;
-        outline: none;
-        color: #fff;
-        font-size: 0.75rem;
-        font-weight: 700;
-        cursor: pointer;
-        appearance: none;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        option {
-          background: #1a1a2e;
-          color: #fff;
-        }
-      }
-
-      &:focus-within {
-        border-color: var(--main-color);
-      }
+      select { background: transparent; border: none; outline: none; color: #fff; font-size: 0.75rem; font-weight: 700;
+        cursor: pointer; appearance: none; text-transform: uppercase; letter-spacing: 0.5px;
+        option { background: #1a1a2e; color: #fff; } }
+      &:focus-within { border-color: var(--main-color); }
     }
-
-    .count-badge {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem 1.25rem;
-      background: rgba(var(--main-color-rgb), 0.08);
-      border: 1px solid rgba(var(--main-color-rgb), 0.15);
-      border-radius: 14px;
-      font-size: 0.7rem;
-      font-weight: 900;
-      color: var(--main-color);
-      white-space: nowrap;
-
-      span { opacity: 0.4; margin-left: 0.35rem; }
-    }
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      .search-box { min-width: unset; }
-    }
+    .count-badge { display: flex; align-items: center; padding: 0.75rem 1.25rem;
+      background: rgba(var(--main-color-rgb), 0.08); border: 1px solid rgba(var(--main-color-rgb), 0.15);
+      border-radius: 14px; font-size: 0.7rem; font-weight: 900; color: var(--main-color); white-space: nowrap;
+      span { opacity: 0.4; margin-left: 0.35rem; } }
+    @media (max-width: 768px) { flex-direction: column; .search-box { min-width: unset; } }
   }
-
-  .table-wrapper {
-    overflow-x: auto;
-    width: 100%;
-    scrollbar-width: thin;
-    scrollbar-color: var(--main-color) rgba(255, 255, 255, 0.05);
+  .table-wrapper { overflow-x: auto; width: 100%; scrollbar-width: thin;
+    scrollbar-color: var(--main-color) rgba(255,255,255,0.05);
     &::-webkit-scrollbar { height: 6px; }
-    &::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-    &::-webkit-scrollbar-thumb { background: var(--main-color); border-radius: 10px; }
-  }
-
-  table {
-    width: 100%;
-    min-width: 800px;
-    border-collapse: separate;
-    border-spacing: 0 0.75rem;
-
-    th {
-      padding: 1.5rem 1rem;
-      text-align: left;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      opacity: 0.4;
-      letter-spacing: 0.2em;
-      font-weight: 900;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    td {
-      padding: 1.25rem 1rem;
-      font-size: 0.9rem;
-      background: rgba(255, 255, 255, 0.02);
-      transition: all var(--q-transition-speed) var(--q-transition-ease);
-      vertical-align: middle;
+    &::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+    &::-webkit-scrollbar-thumb { background: var(--main-color); border-radius: 10px; } }
+  table { width: 100%; min-width: 800px; border-collapse: separate; border-spacing: 0 0.75rem;
+    th { padding: 1.5rem 1rem; text-align: left; font-size: 0.65rem; text-transform: uppercase; opacity: 0.4;
+      letter-spacing: 0.2em; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    td { padding: 1.25rem 1rem; font-size: 0.9rem; background: rgba(255,255,255,0.02);
+      transition: all var(--q-transition-speed) var(--q-transition-ease); vertical-align: middle;
       &:first-child { border-radius: 16px 0 0 16px; }
-      &:last-child { border-radius: 0 16px 16px 0; }
-    }
-
-    tr:hover td {
-      background: rgba(255, 255, 255, 0.05);
-      transform: translateY(-2px);
-    }
-
-    .project-info {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
+      &:last-child { border-radius: 0 16px 16px 0; } }
+    tr:hover td { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+    .project-info { display: flex; align-items: center; gap: 1.5rem;
       img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
-      .title { font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
-    }
-
-    .category-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      background: rgba(var(--main-color-rgb), 0.1);
-      border: 1px solid rgba(var(--main-color-rgb), 0.2);
-      border-radius: 8px;
-      font-size: 0.7rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: var(--main-color);
-      white-space: nowrap;
-    }
-
-    .actions {
-      display: flex;
-      gap: 0.75rem;
-      justify-content: flex-end;
-
-      button {
-        width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
-        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-        cursor: pointer; transition: all var(--q-transition-speed) var(--q-transition-ease);
-        border-radius: 12px; font-size: 0.9rem;
-
+      .title { font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; } }
+    .type-badges { display: flex; flex-wrap: wrap; gap: 0.35rem;
+      .category-badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 0.65rem;
+        font-weight: 900; text-transform: uppercase; white-space: nowrap; } }
+    .actions { display: flex; gap: 0.75rem; justify-content: flex-end;
+      button { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); cursor: pointer;
+        transition: all var(--q-transition-speed) var(--q-transition-ease); border-radius: 12px; font-size: 0.9rem;
         &.edit { color: #3498db; &:hover { background: rgba(52,152,219,0.15); border-color: #3498db; transform: translateY(-2px); } }
-        &.delete { color: #e74c3c; &:hover { background: rgba(231,76,60,0.15); border-color: #e74c3c; transform: translateY(-2px); } }
-      }
-    }
-  }
-
+        &.delete { color: #e74c3c; &:hover { background: rgba(231,76,60,0.15); border-color: #e74c3c; transform: translateY(-2px); } } } } }
   @media (max-width: 768px) {
     table, thead, tbody, th, td, tr { display: block; width: 100%; min-width: unset; }
     thead { display: none; }
-    tr {
-      background: rgba(255,255,255,0.05); backdrop-filter: var(--q-blur-dashboard-mobile);
-      border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem;
-      border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; box-sizing: border-box;
-    }
-    td {
-      padding: 1rem 0; background: transparent !important; display: grid !important;
+    tr { background: rgba(255,255,255,0.05); backdrop-filter: var(--q-blur-dashboard-mobile);
+      border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08);
+      display: flex; flex-direction: column; box-sizing: border-box; }
+    td { padding: 1rem 0; background: transparent !important; display: grid !important;
       grid-template-columns: 1fr auto; align-items: center; border: none !important;
       border-bottom: 1px solid rgba(255,255,255,0.05) !important;
       &:first-child { padding-top: 0; border-radius: 0; }
       &:last-child { padding-bottom: 0; border-bottom: none !important; border-radius: 0; }
-      &::before { content: attr(data-label) ": "; font-size: 0.7rem; text-transform: uppercase; opacity: 0.4; font-weight: 900; letter-spacing: 0.15em; color: #fff; }
-      &:first-child { display: flex !important; justify-content: flex-start; gap: 1.5rem; &::before { display: none; } .project-info { width: 100%; .title { font-size: 1.1rem; font-weight: 800; color: #3498db; white-space: normal; } } }
-      .category-badge, .actions { justify-self: end; }
-      .category-badge { padding: 8px 16px; background: rgba(52,152,219,0.1); border: 1px solid rgba(52,152,219,0.3); border-radius: 12px; color: #3498db; }
-      .actions { button { width: 48px; height: 48px; border-radius: 16px; &.edit { color: #3498db; } &.delete { color: #e74c3c; } } }
-    }
-    tr:hover td { transform: none; }
-  }
+      &::before { content: attr(data-label) ": "; font-size: 0.7rem; text-transform: uppercase; opacity: 0.4;
+        font-weight: 900; letter-spacing: 0.15em; color: #fff; }
+      &:first-child { display: flex !important; justify-content: flex-start; gap: 1.5rem;
+        &::before { display: none; }
+        .project-info { width: 100%; .title { font-size: 1.1rem; font-weight: 800; color: #3498db; white-space: normal; } } }
+      .type-badges, .actions { justify-self: end; }
+      .actions { button { width: 48px; height: 48px; border-radius: 16px; &.edit { color: #3498db; } &.delete { color: #e74c3c; } } } }
+    tr:hover td { transform: none; } }
 `;
 
 type TabKey = "overview" | "projects" | "statistics" | "settings";
+
+function getCroppedImg(imageSrc: string, crop: { x: number; y: number }, zoom: number): Promise<File> {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = imageSrc;
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      const naturalWidth = image.naturalWidth;
+      const naturalHeight = image.naturalHeight;
+      const aspect = 16 / 9;
+
+      let outputWidth = naturalWidth;
+      let outputHeight = naturalWidth / aspect;
+      if (outputHeight > naturalHeight) {
+        outputHeight = naturalHeight;
+        outputWidth = naturalHeight * aspect;
+      }
+
+      canvas.width = outputWidth;
+      canvas.height = outputHeight;
+      const ctx = canvas.getContext("2d")!;
+
+      const cropAreaWidth = naturalWidth / zoom;
+      const cropAreaHeight = cropAreaWidth / aspect;
+      const cropX = (naturalWidth - cropAreaWidth) / 2 + (crop.x / 100) * (cropAreaWidth / 2);
+      const cropY = (naturalHeight - cropAreaHeight) / 2 + (crop.y / 100) * (cropAreaHeight / 2);
+
+      ctx.drawImage(image, cropX, cropY, cropAreaWidth, cropAreaHeight, 0, 0, outputWidth, outputHeight);
+
+      canvas.toBlob((blob) => {
+        resolve(new File([blob!], "cropped.jpg", { type: "image/jpeg" }));
+      }, "image/jpeg", 0.9);
+    };
+  });
+}
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -559,84 +320,104 @@ const Dashboard = () => {
 
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
 
-  const languages = ["arabic", "english"];
-  const technologies = [
-    "html", "css", "javascript", "typescript", "react", "redux", "sass",
-    "bootstrap", "tailwind", "vite", "webpack", "gulp", "eslint",
-    "prettier", "nextjs", "axios", "formik", "yup", "reactRouter",
-    "firebase", "zustand",
-  ];
-
   const [uploadingImage, setUploadingImage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState("20");
-  const [type, setType] = useState("website");
+  const [types, setTypes] = useState<string[]>(["website"]);
   const [techs, setTechs] = useState<string[]>(["html", "css", "javascript"]);
   const [langs, setLangs] = useState<string[]>(["english"]);
-  const [image, setImage] = useState<{ file: null | File; url: string }>({ file: null, url: "" });
+  const [imageFiles, setImageFiles] = useState<{ file: File; url: string }[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [error, setError] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [sourceOptions, setSourceOptions] = useState<string[]>([]);
+
+  const [cropImage, setCropImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const initialProjectData = {
-    title: "",
-    developer: "",
-    source: "",
-    visit: "",
-    disc: "",
-    rate: "20",
-    image: "",
-    langs: ["english"],
-    techs: ["html", "css", "javascript"],
-    type: "website",
+    title: "", developer: "", source: "", visit: "", disc: "",
+    rate: "20", langs: ["english"], techs: ["html", "css", "javascript"], types: ["website"],
   };
-
   const [projectData, setProjectData] = useState(initialProjectData);
 
   const fetchProjects = async () => {
     try {
       const response = await fetch(`${API_URL}/api/projects`);
       if (!response.ok) throw new Error("Failed to fetch projects");
-      const data = await response.json();
-      setProjects(data);
-    } catch (error) {
-      // Failed to fetch
-    }
+      setProjects(await response.json());
+    } catch (error) {}
   };
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  const fetchSources = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/projects/sources`);
+      if (!response.ok) throw new Error("Failed to fetch sources");
+      setSourceOptions(await response.json());
+    } catch (error) {}
+  };
 
-  const filteredProjects = projects
-    .filter((p) => {
-      const matchesSearch = p.title?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesType = filterType === "all" || p.type === filterType;
-      return matchesSearch && matchesType;
-    })
-    .sort((a, b) => {
-      if (sortBy === "newest") return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-      if (sortBy === "oldest") return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
-      if (sortBy === "rated") return (+b.rate || 0) - (+a.rate || 0);
-      if (sortBy === "alpha") return (a.title || "").localeCompare(b.title || "");
-      return 0;
-    });
+  useEffect(() => { fetchProjects(); fetchSources(); }, []);
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const filteredProjects = useMemo(() => {
+    return projects
+      .filter((p) => {
+        const matchesSearch = p.title?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = filterType === "all" || (p.types || [p.type]).includes(filterType);
+        return matchesSearch && matchesType;
+      })
+      .sort((a, b) => {
+        if (sortBy === "newest") return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        if (sortBy === "oldest") return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+        if (sortBy === "rated") return (+b.rate || 0) - (+a.rate || 0);
+        if (sortBy === "alpha") return (a.title || "").localeCompare(b.title || "");
+        return 0;
+      });
+  }, [projects, searchQuery, filterType, sortBy]);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage({ file, url: URL.createObjectURL(file) });
+      const url = URL.createObjectURL(file);
+      setCropImage(url);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
     }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleCropConfirm = async () => {
+    if (!cropImage) return;
+    setUploadingImage(true);
+    try {
+      const croppedFile = await getCroppedImg(cropImage, crop, zoom);
+      const croppedUrl = URL.createObjectURL(croppedFile);
+      setImageFiles((prev) => [...prev, { file: croppedFile, url: croppedUrl }]);
+    } catch (e) {}
+    setUploadingImage(false);
+    setCropImage(null);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    if (technologies.includes(name)) {
+    const allTechs = Object.values(techCategories.frontend).flat().concat(Object.values(techCategories.backend).flat());
+    if (allTechs.includes(name)) {
       const checkbox = e.target as HTMLInputElement;
       if (checkbox.checked) setTechs((prev) => [...prev, name]);
       else setTechs((prev) => prev.filter((el) => el !== name));
@@ -644,42 +425,53 @@ const Dashboard = () => {
       const checkbox = e.target as HTMLInputElement;
       if (checkbox.checked) setLangs((prev) => [...prev, name]);
       else setLangs((prev) => prev.filter((el) => el !== name));
-    } else if (name == "type") {
-      setType(value);
-    } else if (name == "title" || name == "developer" || name == "source" || name == "visit" || name == "disc") {
+    } else if (ALL_PROJECT_TYPES.includes(name)) {
+      const checkbox = e.target as HTMLInputElement;
+      if (checkbox.checked) setTypes((prev) => [...prev, name]);
+      else setTypes((prev) => prev.filter((el) => el !== name));
+    } else if (name === "developer" || name === "source" || name === "title" || name === "visit" || name === "disc") {
       setProjectData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   useEffect(() => {
-    setProjectData((prev) => ({ ...prev, langs, techs, type, rate: range, image: image.url }));
-  }, [langs, techs, type, range, image.url]);
+    setProjectData((prev) => ({ ...prev, langs, techs, types, rate: range }));
+  }, [langs, techs, types, range]);
 
-  const handleRange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRange(e.target.value);
-  };
+  const handleRange = (e: React.ChangeEvent<HTMLInputElement>) => setRange(e.target.value);
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     const formData = new FormData();
-    Object.entries(projectData).forEach(([key, value]) => {
-      if (['_id', '__v', 'createdAt', 'image'].includes(key)) return;
-      if (key === 'langs' || key === 'techs') formData.append(key, JSON.stringify(value));
-      else formData.append(key, value as string);
-    });
+    formData.append("title", projectData.title);
+    formData.append("developer", projectData.developer);
+    formData.append("source", projectData.source);
+    formData.append("visit", projectData.visit);
+    formData.append("disc", projectData.disc);
+    formData.append("rate", range);
+    formData.append("langs", JSON.stringify(langs));
+    formData.append("techs", JSON.stringify(techs));
+    formData.append("types", JSON.stringify(types));
 
-    if (image.file) formData.append('image', image.file);
+    if (editId && existingImages.length > 0) {
+      formData.append("existingImages", JSON.stringify(existingImages));
+    }
+
+    for (const img of imageFiles) {
+      formData.append("images", img.file);
+    }
 
     try {
       const url = editId ? `${API_URL}/api/projects/${editId}` : `${API_URL}/api/projects`;
-      const method = editId ? 'PUT' : 'POST';
+      const method = editId ? "PUT" : "POST";
       const response = await fetch(url, { method, body: formData });
-      if (!response.ok) throw new Error('Failed to save project');
+      if (!response.ok) throw new Error("Failed to save project");
       setNewProject((prev) => !prev);
       handleReset();
       fetchProjects();
+      fetchSources();
     } catch (error) {
       setError(true);
     } finally {
@@ -688,27 +480,43 @@ const Dashboard = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm(t("dashboard.confirm_delete") || "Are you sure you want to delete this project?")) return;
+    if (!window.confirm(t("dashboard.confirm_delete") || "Are you sure?")) return;
     try {
-      const response = await fetch(`${API_URL}/api/projects/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete project');
+      const response = await fetch(`${API_URL}/api/projects/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete");
       setNewProject((prev) => !prev);
       fetchProjects();
-    } catch (error) {
-      // Failed to delete
-    }
+      fetchSources();
+    } catch (error) {}
   };
 
   const handleEdit = (project: any) => {
     setActiveTab("projects");
     setEditId(project._id);
-    setProjectData(project);
-    setTechs(project.techs);
-    setLangs(project.langs);
-    setType(project.type);
-    setRange(project.rate);
-    setImage({ file: null, url: project.image?.startsWith('/uploads') ? `${API_URL}${project.image}` : project.image });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setProjectData({
+      title: project.title || "",
+      developer: project.developer || "",
+      source: project.source || "",
+      visit: project.visit || "",
+      disc: project.disc || "",
+      rate: project.rate || "20",
+      langs: project.langs || ["english"],
+      techs: project.techs || [],
+      types: project.types || [project.type] || ["website"],
+    });
+    setTechs(project.techs || []);
+    setLangs(project.langs || ["english"]);
+    setTypes(project.types || [project.type] || ["website"]);
+    setRange(project.rate || "20");
+    setImageFiles([]);
+    setExistingImages(
+      project.images
+        ? project.images.filter((img: string) => img)
+        : project.image
+        ? [project.image]
+        : []
+    );
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleReset = () => {
@@ -716,9 +524,10 @@ const Dashboard = () => {
     setProjectData(initialProjectData);
     setTechs(["html", "css", "javascript"]);
     setLangs(["english"]);
-    setType("website");
+    setTypes(["website"]);
     setRange("20");
-    setImage({ file: null, url: "" });
+    setImageFiles([]);
+    setExistingImages([]);
   };
 
   const tabs: { key: TabKey; icon: any; labelKey: string }[] = [
@@ -748,15 +557,13 @@ const Dashboard = () => {
       </TabBar>
 
       <TabContent>
-        {activeTab === "overview" && (
-          <AdminOverview projects={projects} />
-        )}
+        {activeTab === "overview" && <AdminOverview projects={projects} />}
 
         {activeTab === "projects" && (
           <>
             <Styled_Form onSubmit={handleAdd} onReset={handleReset}>
               <div className="header">
-                <h2>{editId ? t("dashboard.edit_project") || "Edit Project" : t("dashboard.add_project") || "Add New Project"}</h2>
+                <h2>{editId ? t("dashboard.edit_project") : t("dashboard.add_project")}</h2>
                 <div className="line" />
               </div>
 
@@ -781,7 +588,15 @@ const Dashboard = () => {
                   <label htmlFor="source">{t("dashboard.idea_source")}</label>
                   <div className="field">
                     <FontAwesomeIcon icon={faPen} />
-                    <input type="text" placeholder="Idea Source" id="source" name="source" value={projectData.source} onChange={handleChange} required />
+                    <select name="source" id="source" value={projectData.source} onChange={handleChange} required>
+                      <option value="">{t("admin.select_source") || "Select source..."}</option>
+                      {sourceOptions.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                      {projectData.source && !sourceOptions.includes(projectData.source) && (
+                        <option value={projectData.source}>{projectData.source}</option>
+                      )}
+                    </select>
                   </div>
                 </div>
 
@@ -802,114 +617,147 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-section">
-                <div className="selection-box">
-                  <div className="title"><FontAwesomeIcon icon={faChessPawn} />{t("portfolio.type") || "Project Category"}</div>
-                  <div className="options">
-                    {["website", "game", "simple", "dashboard", "app"].map((val) => (
-                      <div key={val} className="option">
-                        <input type="radio" onChange={handleChange} name="type" id={val} value={val} checked={type == val} />
-                        <label htmlFor={val}>{t(`portfolio.category.${val}`)}</label>
-                      </div>
-                    ))}
-                  </div>
+              <div className="selection-box">
+                <div className="title"><FontAwesomeIcon icon={faChessPawn} />{t("portfolio.type") || "Project Types"}</div>
+                <div className="options">
+                  {ALL_PROJECT_TYPES.map((val) => (
+                    <div key={val} className="option">
+                      <input type="checkbox" onChange={handleChange} name={val} id={`type-${val}`} checked={types.includes(val)} />
+                      <label htmlFor={`type-${val}`}>{t(`portfolio.category.${val}`)}</label>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
-                <div className="selection-box">
-                  <div className="title"><FontAwesomeIcon icon={faCode} />{t("portfolio.techs") || "Technologies Used"}</div>
-                  <div className="options">
-                    {technologies.map((tech) => (
-                      <div key={tech} className="option">
-                        <input type="checkbox" name={tech} id={tech} onChange={handleChange} checked={techs.includes(tech)} />
-                        <label htmlFor={tech}>{tech.toUpperCase()}</label>
-                      </div>
-                    ))}
+              <div className="selection-box">
+                <div className="title"><FontAwesomeIcon icon={faCode} />{t("portfolio.techs") || "Technologies"}</div>
+                {(Object.keys(techCategories.frontend) as Array<keyof typeof techCategories.frontend>).map((cat) => (
+                  <div className="tech-category" key={`fe-${cat}`}>
+                    <div className="cat-label">{t(`dashboard.tech.${cat}`) || cat}</div>
+                    <div className="options">
+                      {techCategories.frontend[cat].map((tech) => (
+                        <div key={tech} className="option">
+                          <input type="checkbox" name={tech} id={tech} onChange={handleChange} checked={techs.includes(tech)} />
+                          <label htmlFor={tech}>{tech.toUpperCase()}</label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ))}
+                <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "1.25rem 0" }} />
+                {(Object.keys(techCategories.backend) as Array<keyof typeof techCategories.backend>).map((cat) => (
+                  <div className="tech-category" key={`be-${cat}`}>
+                    <div className="cat-label">{t(`dashboard.tech.${cat}`) || cat}</div>
+                    <div className="options">
+                      {techCategories.backend[cat].map((tech) => (
+                        <div key={tech} className="option">
+                          <input type="checkbox" name={tech} id={tech} onChange={handleChange} checked={techs.includes(tech)} />
+                          <label htmlFor={tech}>{tech.toUpperCase()}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="grid-section">
                 <div className="selection-box">
                   <div className="title"><FontAwesomeIcon icon={faLanguage} />{t("portfolio.langs") || "Languages"}</div>
                   <div className="options">
-                    <div className="option">
-                      <input type="checkbox" name="arabic" onChange={handleChange} id="arabic" checked={langs.includes("arabic")} />
-                      <label htmlFor="arabic">Arabic</label>
-                    </div>
-                    <div className="option">
-                      <input type="checkbox" name="english" onChange={handleChange} id="english" checked={langs.includes("english")} />
-                      <label htmlFor="english">English</label>
-                    </div>
+                    {languages.map((lang) => (
+                      <div key={lang} className="option">
+                        <input type="checkbox" name={lang} onChange={handleChange} id={lang} checked={langs.includes(lang)} />
+                        <label htmlFor={lang}>{lang.charAt(0).toUpperCase() + lang.slice(1)}</label>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 <div className="selection-box">
                   <div className="title"><FontAwesomeIcon icon={faStar} />{t("dashboard.rate")}</div>
-                  <div style={{ position: 'relative', marginTop: '1rem' }}>
-                    <input type="range" name="range" id="rate" style={{ opacity: "0", height: "40px", width: '100%', cursor: 'pointer', zIndex: 2, position: 'relative' }} onChange={handleRange} value={range} />
-                    <div style={{ width: "100%", height: "8px", top: "16px", backgroundColor: "rgba(255,255,255,0.05)", position: "absolute", borderRadius: '4px', overflow: 'hidden' }}>
-                      <div style={{ width: range + "%", height: "100%", background: `linear-gradient(to right, ${+range > 80 ? '#2ecc71' : +range > 40 ? '#3498db' : '#e67e22'}, var(--main-color))`, boxShadow: `0 0 10px ${+range > 40 ? 'rgba(52,152,219,0.4)' : 'rgba(230,126,34,0.4)'}` }} />
+                  <div className="rate-display">{Math.round(+range / 20)} / 5</div>
+                  <div style={{ position: "relative", marginTop: "0.5rem" }}>
+                    <input type="range" name="range" id="rate" style={{ opacity: "0", height: "40px", width: "100%", cursor: "pointer", zIndex: 2, position: "relative" }} onChange={handleRange} value={range} />
+                    <div style={{ width: "100%", height: "8px", top: "16px", backgroundColor: "rgba(255,255,255,0.05)", position: "absolute", borderRadius: "4px", overflow: "hidden" }}>
+                      <div style={{ width: range + "%", height: "100%", background: `linear-gradient(to right, ${+range > 80 ? "#2ecc71" : +range > 40 ? "#3498db" : "#e67e22"}, var(--main-color))`, boxShadow: `0 0 10px ${+range > 40 ? "rgba(52,152,219,0.4)" : "rgba(230,126,34,0.4)"}` }} />
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="selection-box">
-                <div className="title"><FontAwesomeIcon icon={faImage} />{t("dashboard.projectImage") || "Project Image"}</div>
+                <div className="title"><FontAwesomeIcon icon={faImage} />{t("dashboard.projectImages") || "Project Images"}</div>
                 <div className="image-upload-container">
-                  <label htmlFor="image" style={{ display: "flex", flexDirection: 'column', alignItems: "center", gap: "1rem", cursor: 'pointer', padding: '2rem', border: '2px dashed rgba(255,255,255,0.1)', borderRadius: '24px', width: '240px' }}>
+                  <label onClick={() => fileInputRef.current?.click()} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem", cursor: "pointer", padding: "2rem", border: "2px dashed rgba(255,255,255,0.1)", borderRadius: "24px", width: "200px" }}>
                     <FontAwesomeIcon icon={faImage} size="2x" />
-                    <span style={{ color: "var(--main-color)", fontWeight: 900, fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                    <span style={{ color: "var(--main-color)", fontWeight: 900, fontSize: "0.7rem", textTransform: "uppercase" }}>
                       {uploadingImage ? t("dashboard.uploading") : t("dashboard.select_image")}
                     </span>
                   </label>
+                  <input ref={fileInputRef} style={{ display: "none" }} type="file" accept="image/*" onChange={handleImageSelect} />
 
-                  {(image.url || projectData.image) && (
-                    <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', width: '320px', height: '180px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                      <img src={image.url || projectData.image || "./assets/project-placeholder.png"} alt="Preview" style={{ width: "100%", height: "100%", objectFit: 'cover' }} />
-                    </div>
-                  )}
+                  <div className="images-grid">
+                    {existingImages.map((img, i) => {
+                      const src = img?.startsWith("/uploads") ? `${API_URL}${img}` : img;
+                      return (
+                        <div className="image-thumb" key={`existing-${i}`}>
+                          <img src={src} alt="" />
+                          <div className="image-overlay">
+                            <button type="button" className="delete-btn" onClick={() => handleRemoveExistingImage(i)}>
+                              <FontAwesomeIcon icon={faTrash} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {imageFiles.map((img, i) => (
+                      <div className="image-thumb" key={`new-${i}`}>
+                        <img src={img.url} alt="" />
+                        <div className="image-overlay">
+                          <button type="button" className="delete-btn" onClick={() => handleRemoveImage(i)}>
+                            <FontAwesomeIcon icon={faTrash} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <input style={{ display: "none" }} type="file" name="image" id="image" onChange={handleImage} disabled={uploadingImage} />
               </div>
 
-              {error && <div style={{ color: '#e74c3c', textAlign: 'center', fontWeight: 'bold' }}>{t("dashboard.check_fields") || "Please check all fields."}</div>}
+              {error && <div style={{ color: "#e74c3c", textAlign: "center", fontWeight: "bold" }}>{t("dashboard.check_fields")}</div>}
 
               <button type="submit" disabled={loading || uploadingImage}>
                 {uploadingImage ? t("dashboard.uploadingImage") : loading ? t("info.loading") : editId ? (
-                  <><FontAwesomeIcon icon={faSave} style={{ marginRight: '10px' }} />{t("dashboard.save") || "Update Project"}</>
+                  <><FontAwesomeIcon icon={faSave} style={{ marginRight: "10px" }} />{t("dashboard.save")}</>
                 ) : (
-                  <><FontAwesomeIcon icon={faPlus} style={{ marginRight: '10px' }} />{t("dashboard.add")}</>
+                  <><FontAwesomeIcon icon={faPlus} style={{ marginRight: "10px" }} />{t("dashboard.add")}</>
                 )}
               </button>
 
               {editId && (
-                <button type="button" onClick={handleReset} style={{ background: 'rgba(255,255,255,0.1)', marginTop: '1rem' }}>
-                  <FontAwesomeIcon icon={faTimes} style={{ marginRight: '10px' }} />
-                  {t("dashboard.cancel") || "Cancel Edit"}
+                <button type="button" onClick={handleReset} style={{ background: "rgba(255,255,255,0.1)", marginTop: "1rem" }}>
+                  <FontAwesomeIcon icon={faTimes} style={{ marginRight: "10px" }} />
+                  {t("dashboard.cancel")}
                 </button>
               )}
             </Styled_Form>
 
             <StyledTable>
               <h3>{t("dashboard.manage_projects")}</h3>
-
               <div className="toolbar">
                 <div className="search-box">
                   <FontAwesomeIcon icon={faSearch} />
                   <input type="text" placeholder={t("admin.search_projects")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 </div>
-
                 <div className="filter-select">
                   <FontAwesomeIcon icon={faFilter} />
                   <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
                     <option value="all">{t("portfolio.category.all")}</option>
-                    {["website", "game", "simple", "dashboard", "app"].map((val) => (
+                    {ALL_PROJECT_TYPES.map((val) => (
                       <option key={val} value={val}>{t(`portfolio.category.${val}`)}</option>
                     ))}
                   </select>
                 </div>
-
                 <div className="sort-select">
                   <FontAwesomeIcon icon={faArrowDownShortWide} />
                   <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -919,7 +767,6 @@ const Dashboard = () => {
                     <option value="alpha">{t("admin.sort_alpha")}</option>
                   </select>
                 </div>
-
                 <div className="count-badge">
                   {filteredProjects.length}<span>/ {projects.length}</span>
                 </div>
@@ -935,31 +782,41 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredProjects.map((project) => (
-                      <tr key={project._id}>
-                        <td data-label={t("dashboard.projectName")}>
-                          <div className="project-info">
-                            <img src={project.image?.startsWith("/uploads") ? `${API_URL}${project.image}` : project.image || "./assets/project-placeholder.png"} alt="" />
-                            <span className="title">{project.title}</span>
-                          </div>
-                        </td>
-                        <td data-label={t("portfolio.type")}>
-                          <span className="category-badge" style={{ backgroundColor: getProjectTypeStyle(project.type).accentBg, borderColor: getProjectTypeStyle(project.type).color + "50", color: getProjectTypeStyle(project.type).color }}>
-                            {t(`portfolio.category.${project.type}`)}
-                          </span>
-                        </td>
-                        <td data-label={t("dashboard.actions")}>
-                          <div className="actions">
-                            <button className="edit" title={t("dashboard.edit")} onClick={() => handleEdit(project)}>
-                              <FontAwesomeIcon icon={faPen} />
-                            </button>
-                            <button className="delete" title={t("dashboard.delete")} onClick={() => handleDelete(project._id)}>
-                              <FontAwesomeIcon icon={faTrash} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                    {filteredProjects.map((project) => {
+                      const projectTypes = project.types || [project.type];
+                      return (
+                        <tr key={project._id}>
+                          <td data-label={t("dashboard.projectName")}>
+                            <div className="project-info">
+                              <img src={project.image?.startsWith("/uploads") ? `${API_URL}${project.image}` : project.image || "./assets/project-placeholder.png"} alt="" />
+                              <span className="title">{project.title}</span>
+                            </div>
+                          </td>
+                          <td data-label={t("portfolio.type")}>
+                            <div className="type-badges">
+                              {projectTypes.map((ty: string) => {
+                                const style = getProjectTypeStyle(ty);
+                                return (
+                                  <span key={ty} className="category-badge" style={{ backgroundColor: style.accentBg, borderColor: style.color + "50", color: style.color }}>
+                                    {t(`portfolio.category.${ty}`)}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </td>
+                          <td data-label={t("dashboard.actions")}>
+                            <div className="actions">
+                              <button className="edit" title={t("dashboard.edit")} onClick={() => handleEdit(project)}>
+                                <FontAwesomeIcon icon={faPen} />
+                              </button>
+                              <button className="delete" title={t("dashboard.delete")} onClick={() => handleDelete(project._id)}>
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -967,14 +824,21 @@ const Dashboard = () => {
           </>
         )}
 
-        {activeTab === "statistics" && (
-          <AdminStatistics projects={projects} />
-        )}
-
-        {activeTab === "settings" && (
-          <AdminSettings />
-        )}
+        {activeTab === "statistics" && <AdminStatistics projects={projects} />}
+        {activeTab === "settings" && <AdminSettings />}
       </TabContent>
+
+      {cropImage && (
+        <div className="crop-modal">
+          <div className="crop-container">
+            <Cropper image={cropImage} crop={crop} zoom={zoom} aspect={16 / 9} onCropChange={setCrop} onZoomChange={setZoom} />
+          </div>
+          <div className="crop-actions">
+            <button className="cancel" onClick={() => setCropImage(null)}><FontAwesomeIcon icon={faTimes} style={{ marginRight: 8 }} />{t("dashboard.cancel")}</button>
+            <button className="confirm" onClick={handleCropConfirm}><FontAwesomeIcon icon={faCropSimple} style={{ marginRight: 8 }} />{t("dashboard.crop_confirm") || "Crop & Add"}</button>
+          </div>
+        </div>
+      )}
     </PanelWrapper>
   );
 };
