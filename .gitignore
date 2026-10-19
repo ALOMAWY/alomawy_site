@@ -1,31 +1,10 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.sw?
 
-
-# My added
-.env
-backup
-src_old
-myChanges.txt
+# Local review area (kept on disk for now, not part of the apps)
+unused_media/
