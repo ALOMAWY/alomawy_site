@@ -27,7 +27,7 @@ function parseJSONArray(value, fallback = []) {
 
 function mapProject(row) {
   if (!row) return null;
-  const { id, created_at, type, image, ...rest } = row;
+  const { id, created_at, type, image, show_on_company_site, ...rest } = row;
 
   const types = parseJSONArray(type, type ? [type] : []);
   const images = parseJSONArray(image, image ? [image] : []);
@@ -39,6 +39,8 @@ function mapProject(row) {
     types,
     image: images[0] || '',
     images,
+    // Default to visible on the company site when the column is null/absent
+    showOnCompanySite: show_on_company_site ?? true,
     ...rest,
   };
 }

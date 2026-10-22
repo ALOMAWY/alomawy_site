@@ -189,6 +189,20 @@ const Styled_Form = styled.form`
       .crop-actions button { padding: 0.7rem 1.4rem; font-size: 0.7rem; }
     }
   }
+  .visibility-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    .visibility-text { .visibility-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 0.05em; opacity: 0.8; display: flex; align-items: center; gap: 0.5rem;
+        svg { color: var(--main-color); } }
+      .visibility-hint { font-size: 0.65rem; opacity: 0.4; margin-top: 0.35rem; max-width: 340px; } } }
+  .switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0;
+    input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; margin: 0; cursor: pointer; }
+    .track { position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 999px; pointer-events: none;
+      transition: background 0.2s;
+      &::before { content: ""; position: absolute; height: 22px; width: 22px; left: 3px; top: 3px; background: #fff;
+        border-radius: 50%; transition: transform 0.2s; } }
+    input:checked + .track { background: var(--main-color);
+      &::before { transform: translateX(24px); } }
+    input:focus-visible + .track { outline: 2px solid #fff; outline-offset: 2px; } }
   .rate-display { text-align: center; font-size: 1.5rem; font-weight: 900; color: var(--main-color);
     margin-bottom: 0.5rem; }
   button[type="submit"] { margin-top: 1rem; padding: 1.5rem; background: var(--main-color); border-radius: 24px;
@@ -253,7 +267,11 @@ const StyledTable = styled.div`
     tr:hover td { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
     .project-info { display: flex; align-items: center; gap: 1.5rem;
       img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
-      .title { font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; } }
+      .title { font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
+      .company-badge { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+        border-radius: 50%; font-size: 0.7rem; flex-shrink: 0; border: 1px solid transparent;
+        &.on { color: #2ecc71; background: rgba(46,204,113,0.15); border-color: rgba(46,204,113,0.4); }
+        &.off { color: #95a5a6; background: rgba(149,165,166,0.12); border-color: rgba(149,165,166,0.3); } } }
     .type-badges { display: flex; flex-wrap: wrap; gap: 0.35rem;
       .category-badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 0.65rem;
         font-weight: 900; text-transform: uppercase; white-space: nowrap; } }
@@ -355,6 +373,7 @@ const Dashboard = () => {
   const initialProjectData = {
     title: "", developer: "", source: "", visit: "", disc: "",
     rate: "20", langs: ["english"], techs: ["html", "css", "javascript"], types: ["website"],
+    showOnCompanySite: true,
   };
   const [projectData, setProjectData] = useState(initialProjectData);
 
@@ -460,6 +479,10 @@ const Dashboard = () => {
 
   const handleRange = (e: React.ChangeEvent<HTMLInputElement>) => setRange(e.target.value);
 
+  const handleCompanySiteToggle = () => {
+    setProjectData((prev) => ({ ...prev, showOnCompanySite: !prev.showOnCompanySite }));
+  };
+
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -474,6 +497,7 @@ const Dashboard = () => {
     formData.append("langs", JSON.stringify(langs));
     formData.append("techs", JSON.stringify(techs));
     formData.append("types", JSON.stringify(types));
+    formData.append("showOnCompanySite", String(projectData.showOnCompanySite));
 
     if (editId && existingImages.length > 0) {
       formData.append("existingImages", JSON.stringify(existingImages));
@@ -523,6 +547,7 @@ const Dashboard = () => {
       langs: project.langs || ["english"],
       techs: project.techs || [],
       types: project.types || [project.type] || ["website"],
+      showOnCompanySite: project.showOnCompanySite ?? true,
     });
     setTechs(project.techs || []);
     setLangs(project.langs || ["english"]);
@@ -731,6 +756,20 @@ const Dashboard = () => {
               </div>
 
               <div className="selection-box">
+                <div className="title"><FontAwesomeIcon icon={faEye} />{t("dashboard.visibility", "Visibility")}</div>
+                <div className="visibility-row">
+                  <div className="visibility-text">
+                    <div className="visibility-label">Show on company website</div>
+                    <div className="visibility-hint">When off, this project is hidden from the company site. Your personal site is unaffected.</div>
+                  </div>
+                  <label className="switch">
+                    <input type="checkbox" checked={projectData.showOnCompanySite} onChange={handleCompanySiteToggle} />
+                    <span className="track" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="selection-box">
                 <div className="title"><FontAwesomeIcon icon={faImage} />{t("dashboard.projectImages") || "Project Images"}</div>
                 <div className="image-upload-container">
                   <label onClick={() => fileInputRef.current?.click()} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem", cursor: "pointer", padding: "2rem", border: "2px dashed rgba(255,255,255,0.1)", borderRadius: "24px", width: "200px" }}>
@@ -835,6 +874,9 @@ const Dashboard = () => {
                             <div className="project-info">
                               <img src={project.image?.startsWith("/uploads") ? `${API_URL}${project.image}` : project.image || "./assets/project-placeholder.png"} alt="" />
                               <span className="title">{project.title}</span>
+                              <span className={`company-badge ${project.showOnCompanySite ? "on" : "off"}`} title={project.showOnCompanySite ? "Visible on company site" : "Hidden from company site"}>
+                                <FontAwesomeIcon icon={faEye} />
+                              </span>
                             </div>
                           </td>
                           <td data-label={t("portfolio.type")}>

@@ -63,7 +63,7 @@ router.get('/sources', async (req, res) => {
 
 // Add a new project
 router.post('/', upload.array('images', 10), async (req, res) => {
-  const { title, developer, source, visit, disc, rate, langs, techs, types, type, date } = req.body;
+  const { title, developer, source, visit, disc, rate, langs, techs, types, type, date, showOnCompanySite } = req.body;
 
   const parsedLangs = typeof langs === 'string' ? JSON.parse(langs) : langs;
   const parsedTechs = typeof techs === 'string' ? JSON.parse(techs) : techs;
@@ -89,6 +89,8 @@ router.post('/', upload.array('images', 10), async (req, res) => {
     type: JSON.stringify(parsedTypes),
     date,
     image: JSON.stringify(imageUrls),
+    // Booleans arrive as strings in multipart form data; default to visible
+    show_on_company_site: showOnCompanySite === 'true' || showOnCompanySite === true,
   };
 
   try {
@@ -109,7 +111,7 @@ router.post('/', upload.array('images', 10), async (req, res) => {
 router.put('/:id', upload.array('images', 10), async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, developer, source, visit, disc, rate, langs, techs, types, type, date, existingImages } = req.body;
+    const { title, developer, source, visit, disc, rate, langs, techs, types, type, date, existingImages, showOnCompanySite } = req.body;
 
     const { data: existing, error: findError } = await getClient()
       .from(TABLE)
@@ -122,6 +124,9 @@ router.put('/:id', upload.array('images', 10), async (req, res) => {
     }
 
     const updateData = { title, developer, source, visit, disc, rate, date };
+    if (showOnCompanySite !== undefined) {
+      updateData.show_on_company_site = showOnCompanySite === 'true' || showOnCompanySite === true;
+    }
 
     let parsedTypes;
     if (types) {
