@@ -13,6 +13,8 @@ import {
   faPlus,
   faSave,
   faTimes,
+  faCropSimple,
+  faCheck,
   faRightFromBracket,
   faChartBar,
   faFolderOpen,
@@ -33,6 +35,7 @@ import { getProjectTypeStyle, ALL_PROJECT_TYPES } from "../utils";
 import AdminOverview from "./AdminOverview";
 import AdminStatistics from "./AdminStatistics";
 import AdminSettings from "./AdminSettings";
+import Cropper from "react-easy-crop";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -167,6 +170,25 @@ const Styled_Form = styled.form`
       &.delete-btn:hover { background: rgba(231, 76, 60, 0.3); border-color: #e74c3c; color: #e74c3c; }
     }
   }
+  .crop-editor { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--main-color);
+    border-radius: 24px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(var(--main-color-rgb), 0.15);
+    .crop-editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;
+      h3 { font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: var(--main-color);
+        display: flex; align-items: center; gap: 0.5rem; margin: 0; } }
+    .crop-container { position: relative; width: 100%; max-width: 640px; margin: 0 auto; height: 360px;
+      border-radius: 16px; overflow: hidden; background: #000; }
+    .crop-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1.25rem; flex-wrap: wrap; }
+    .crop-actions button { padding: 0.75rem 2rem; border-radius: 12px; font-weight: 800; font-size: 0.8rem;
+      text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+    .crop-actions .confirm { background: var(--main-color); color: #fff; border-color: var(--main-color);
+      &:hover { filter: brightness(1.1); } }
+    .crop-actions .cancel { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2);
+      &:hover { background: rgba(255,255,255,0.15); } }
+    @media (max-width: 768px) {
+      .crop-container { height: 240px; }
+      .crop-actions button { padding: 0.7rem 1.4rem; font-size: 0.7rem; }
+    }
+  }
   .rate-display { text-align: center; font-size: 1.5rem; font-weight: 900; color: var(--main-color);
     margin-bottom: 0.5rem; }
   button[type="submit"] { margin-top: 1rem; padding: 1.5rem; background: var(--main-color); border-radius: 24px;
@@ -264,6 +286,42 @@ const StyledTable = styled.div`
 
 type TabKey = "overview" | "projects" | "statistics" | "settings";
 
+function getCroppedImg(imageSrc: string, crop: { x: number; y: number }, zoom: number): Promise<File> {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = imageSrc;
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      const naturalWidth = image.naturalWidth;
+      const naturalHeight = image.naturalHeight;
+      const aspect = 16 / 9;
+
+      let outputWidth = naturalWidth;
+      let outputHeight = naturalWidth / aspect;
+      if (outputHeight > naturalHeight) {
+        outputHeight = naturalHeight;
+        outputWidth = naturalHeight * aspect;
+      }
+
+      canvas.width = outputWidth;
+      canvas.height = outputHeight;
+      const ctx = canvas.getContext("2d")!;
+
+      const cropAreaWidth = naturalWidth / zoom;
+      const cropAreaHeight = cropAreaWidth / aspect;
+      const cropX = (naturalWidth - cropAreaWidth) / 2 + (crop.x / 100) * (cropAreaWidth / 2);
+      const cropY = (naturalHeight - cropAreaHeight) / 2 + (crop.y / 100) * (cropAreaHeight / 2);
+
+      ctx.drawImage(image, cropX, cropY, cropAreaWidth, cropAreaHeight, 0, 0, outputWidth, outputHeight);
+
+      canvas.toBlob((blob) => {
+        resolve(new File([blob!], "cropped.jpg", { type: "image/jpeg" }));
+      }, "image/jpeg", 0.9);
+    };
+  });
+}
+
 const Dashboard = () => {
   const { t } = useTranslation();
   const { setNewProject } = useMyContext();
@@ -287,7 +345,12 @@ const Dashboard = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [sourceOptions, setSourceOptions] = useState<string[]>([]);
 
+  const [cropImage, setCropImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cropEditorRef = useRef<HTMLDivElement>(null);
 
   const initialProjectData = {
     title: "", developer: "", source: "", visit: "", disc: "",
@@ -313,6 +376,11 @@ const Dashboard = () => {
 
   useEffect(() => { fetchProjects(); fetchSources(); }, []);
 
+  // After an image is chosen, send the user to the top of the page where the inline editor appears
+  useEffect(() => {
+    if (cropImage) window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [cropImage]);
+
   const filteredProjects = useMemo(() => {
     return projects
       .filter((p) => {
@@ -333,9 +401,28 @@ const Dashboard = () => {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setImageFiles((prev) => [...prev, { file, url }]);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCropImage(url); // opens the inline crop/edit editor at the top of the form
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const cancelCrop = () => {
+    if (cropImage) URL.revokeObjectURL(cropImage);
+    setCropImage(null);
+  };
+
+  const handleCropConfirm = async () => {
+    if (!cropImage) return;
+    setUploadingImage(true);
+    try {
+      const croppedFile = await getCroppedImg(cropImage, crop, zoom);
+      const croppedUrl = URL.createObjectURL(croppedFile);
+      setImageFiles((prev) => [...prev, { file: croppedFile, url: croppedUrl }]);
+    } catch (e) {}
+    setUploadingImage(false);
+    setCropImage(null);
   };
 
   const handleRemoveImage = (index: number) => {
@@ -495,6 +582,31 @@ const Dashboard = () => {
         {activeTab === "projects" && (
           <>
             <Styled_Form onSubmit={handleAdd} onReset={handleReset}>
+              {cropImage && (
+                <div className="crop-editor" ref={cropEditorRef}>
+                  <div className="crop-editor-header">
+                    <h3><FontAwesomeIcon icon={faCropSimple} />Edit &amp; Crop Image</h3>
+                  </div>
+                  <div className="crop-container">
+                    <Cropper
+                      image={cropImage}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={16 / 9}
+                      onCropChange={setCrop}
+                      onZoomChange={setZoom}
+                    />
+                  </div>
+                  <div className="crop-actions">
+                    <button type="button" className="cancel" onClick={cancelCrop}>
+                      <FontAwesomeIcon icon={faTimes} style={{ marginRight: 8 }} />{t("dashboard.cancel")}
+                    </button>
+                    <button type="button" className="confirm" onClick={handleCropConfirm}>
+                      <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />{t("dashboard.crop_confirm") || "Crop & Add"}
+                    </button>
+                  </div>
+                </div>
+              )}
               <div className="header">
                 <h2>{editId ? t("dashboard.edit_project") : t("dashboard.add_project")}</h2>
                 <div className="line" />
