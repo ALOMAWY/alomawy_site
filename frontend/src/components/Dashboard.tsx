@@ -61,66 +61,236 @@ const techCategories = {
 const languages = ["arabic", "english"];
 
 const PanelWrapper = styled.div`
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
-  @media (max-width: 768px) { padding: 0 0.75rem; margin: 1rem auto; }
+  min-height: 100vh;
+  color: #f4f6fb;
+  background: #0b1220;
+`;
+
+const DashboardLayout = styled.div`
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+`;
+
+const DashboardSidebar = styled.aside`
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  background: rgba(8, 14, 26, 0.94);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  @media (max-width: 900px) {
+    position: static;
+    height: auto;
+    padding: 0.75rem;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+`;
+
+const DashboardBrand = styled.div`
+  padding: 0.6rem 0.75rem 1.7rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  span {
+    display: block;
+    margin-top: 0.3rem;
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 900px) { display: none; }
 `;
 
 const PanelHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  gap: 1rem;
+  min-height: 112px;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 1.25rem;
   flex-wrap: wrap;
-  @media (max-width: 768px) { flex-direction: column; align-items: stretch; }
-  .header-title { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #fff; }
+  .header-title { font-size: 1.35rem; font-weight: 750; color: #fff; letter-spacing: -0.02em; }
+  .header-description { color: rgba(226, 232, 240, 0.58); font-size: 0.82rem; margin-top: 0.45rem; }
+  .header-actions { display: flex; align-items: center; gap: 0.65rem; }
+  .project-total { color: rgba(226, 232, 240, 0.65); font-size: 0.78rem; white-space: nowrap; }
+  .create-project-btn {
+    display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.75rem 1rem;
+    border-radius: 10px; background: var(--main-color); color: #fff; font-weight: 700;
+    &:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  }
   .logout-btn {
     display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;
-    background: rgba(231, 76, 60, 0.15); border: 1px solid rgba(231, 76, 60, 0.3);
-    border-radius: 12px; color: #e74c3c; font-weight: 800; font-size: 0.75rem;
-    text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; color: rgba(226,232,240,0.72); font-weight: 650; font-size: 0.78rem;
     transition: all var(--q-transition-speed) var(--q-transition-ease); white-space: nowrap;
-    &:hover { background: rgba(231, 76, 60, 0.25); border-color: #e74c3c; }
+    &:hover { background: rgba(231, 76, 60, 0.14); border-color: rgba(231,76,60,0.4); color: #ff827a; }
+  }
+  @media (max-width: 900px) {
+    min-height: 84px;
+    padding: 1rem;
+  }
+  @media (max-width: 560px) {
+    .header-actions { width: 100%; }
+    .project-total { margin-right: auto; }
+    .logout-btn { padding: 0.7rem; }
   }
 `;
 
 const TabBar = styled.div`
-  display: flex; gap: 0.5rem; background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: var(--q-blur-dashboard); border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px; padding: 6px; margin-bottom: 2rem; overflow-x: auto; scrollbar-width: none;
+  display: flex; flex-direction: column; gap: 0.35rem;
   &::-webkit-scrollbar { display: none; }
-  @media (max-width: 768px) { backdrop-filter: var(--q-blur-dashboard-sm); }
+  @media (max-width: 900px) {
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
-  flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center;
-  gap: 0.5rem; padding: 0.85rem 1.25rem; border-radius: 14px; border: 1px solid transparent;
-  background: ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.15)' : 'transparent'};
-  border-color: ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.3)' : 'transparent'};
-  color: ${p => p.$active ? 'var(--main-color)' : 'rgba(255,255,255,0.4)'};
-  font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem 0.9rem; border-radius: 10px;
+  color: ${p => p.$active ? '#fff' : 'rgba(226,232,240,0.58)'};
+  background: ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.18)' : 'transparent'};
+  border: 1px solid ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.34)' : 'transparent'};
+  font-size: 0.82rem; font-weight: ${p => p.$active ? 700 : 550};
   cursor: pointer; transition: all var(--q-transition-speed) var(--q-transition-ease); white-space: nowrap;
-  svg { font-size: 0.85rem; }
+  text-align: left;
+  svg { width: 1rem; font-size: 0.9rem; color: ${p => p.$active ? 'var(--main-color)' : 'rgba(226,232,240,0.45)'}; }
   &:hover:not([disabled]) {
-    background: ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.2)' : 'rgba(255,255,255,0.05)'};
-    color: ${p => p.$active ? 'var(--main-color)' : 'rgba(255,255,255,0.6)'};
+    background: ${p => p.$active ? 'rgba(var(--main-color-rgb), 0.22)' : 'rgba(255,255,255,0.045)'};
+    color: #fff;
   }
-  @media (max-width: 768px) { min-width: 70px; padding: 0.7rem 0.75rem; font-size: 0.6rem; gap: 0.35rem; }
+  @media (max-width: 900px) { padding: 0.7rem 0.85rem; }
 `;
 
 const TabContent = styled.div`
-  background: rgba(0, 0, 0, 0.5); backdrop-filter: var(--q-blur-dashboard);
-  border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 32px; padding: 2rem; color: #fff;
-  @media (max-width: 768px) { backdrop-filter: var(--q-blur-dashboard-sm); padding: 1rem; border-radius: 24px; }
+  min-width: 0;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 3rem;
+  color: #fff;
+`;
+
+const SidebarFooter = styled.div`
+  margin-top: auto;
+  padding: 1.25rem 0.75rem 0.25rem;
+  color: rgba(226, 232, 240, 0.38);
+  font-size: 0.7rem;
+  @media (max-width: 900px) { display: none; }
+`;
+
+const BulkModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(3, 8, 16, 0.78);
+  backdrop-filter: blur(8px);
+`;
+
+const BulkModal = styled.div`
+  width: min(860px, 100%);
+  max-height: min(90vh, 900px);
+  overflow: auto;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  background: #111a2b;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+  color: #f4f6fb;
+`;
+
+const BulkModalHeader = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: #111a2b;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  h2 { font-size: 1.05rem; font-weight: 750; }
+  p { color: rgba(226,232,240,0.55); font-size: 0.78rem; margin-top: 0.35rem; }
+`;
+
+const BulkModalGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  padding: 1.25rem 1.5rem;
+  @media (max-width: 640px) { grid-template-columns: 1fr; padding: 1rem; }
+`;
+
+const BulkField = styled.div`
+  min-width: 0;
+  padding: 0.95rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.025);
+  &.wide { grid-column: 1 / -1; }
+  .bulk-field-title { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.7rem; color: #e8edf7; font-size: 0.78rem; font-weight: 650; }
+  .bulk-input, .bulk-select, .bulk-textarea {
+    width: 100%; padding: 0.65rem 0.75rem; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1); background: #0c1422; color: #fff;
+    &:focus { border-color: var(--main-color); }
+    &:disabled { opacity: 0.38; cursor: not-allowed; }
+  }
+  .bulk-textarea { min-height: 88px; resize: vertical; }
+`;
+
+const BulkChoiceGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  &.disabled { opacity: 0.38; pointer-events: none; }
+`;
+
+const BulkChoice = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  color: rgba(226,232,240,0.78);
+  background: rgba(255,255,255,0.035);
+  font-size: 0.72rem;
+  cursor: pointer;
+`;
+
+const BulkModalFooter = styled.div`
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding: 1rem 1.5rem;
+  background: #111a2b;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  button { padding: 0.7rem 1rem; border-radius: 9px; font-size: 0.78rem; font-weight: 650; }
+  .cancel { border: 1px solid rgba(255,255,255,0.12); color: rgba(226,232,240,0.75); }
+  .save { background: var(--main-color); color: #fff; }
 `;
 
 const Styled_Form = styled.form`
-  display: flex; flex-direction: column; gap: 2rem;
-  .header { text-align: center; margin-bottom: 1rem;
-    h2 { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.9; }
-    .line { width: 60px; height: 4px; background: var(--main-color); margin: 1rem auto; border-radius: 2px; opacity: 0.5; }
+  display: flex; flex-direction: column; gap: 1.4rem;
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 16px;
+  background: rgba(17, 26, 43, 0.72);
+  .header { text-align: left; margin-bottom: 0.2rem;
+    h2 { font-size: 1.1rem; font-weight: 750; letter-spacing: -0.01em; opacity: 0.96; }
+    .line { display: none; }
   }
   .grid-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; @media (max-width: 768px) { grid-template-columns: 1fr; } }
   .input-group { display: flex; flex-direction: column; gap: 0.75rem;
@@ -226,8 +396,8 @@ const Styled_Form = styled.form`
 
 const StyledTable = styled.div`
   margin-top: 2rem; overflow: hidden;
-  h3 { text-align: center; margin-bottom: 2rem; font-size: 1rem; font-weight: 900; text-transform: uppercase;
-    letter-spacing: 0.3em; opacity: 0.8; color: var(--main-color); }
+  h3 { text-align: left; margin-bottom: 1.1rem; font-size: 1rem; font-weight: 750;
+    letter-spacing: -0.01em; color: #f4f6fb; }
   .toolbar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
     .search-box { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 0.75rem;
       padding: 0.75rem 1.25rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
@@ -258,8 +428,8 @@ const StyledTable = styled.div`
     &::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
     &::-webkit-scrollbar-thumb { background: var(--main-color); border-radius: 10px; } }
   table { width: 100%; min-width: 800px; border-collapse: separate; border-spacing: 0 0.75rem;
-    th { padding: 1.5rem 1rem; text-align: left; font-size: 0.65rem; text-transform: uppercase; opacity: 0.4;
-      letter-spacing: 0.2em; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    th { padding: 0.75rem 1rem; text-align: left; font-size: 0.68rem; text-transform: none; opacity: 0.56;
+      letter-spacing: 0.01em; font-weight: 650; border-bottom: 1px solid rgba(255,255,255,0.08); }
     td { padding: 1.25rem 1rem; font-size: 0.9rem; background: rgba(255,255,255,0.02);
       transition: all var(--q-transition-speed) var(--q-transition-ease); vertical-align: middle;
       &:first-child { border-radius: 16px 0 0 16px; }
@@ -346,6 +516,28 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
+  const [showProjectForm, setShowProjectForm] = useState(false);
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [bulkMenuOpen, setBulkMenuOpen] = useState(false);
+  const [bulkEditorOpen, setBulkEditorOpen] = useState(false);
+  const [bulkValues, setBulkValues] = useState({
+    title: "",
+    developer: "",
+    source: "",
+    visit: "",
+    disc: "",
+    rate: "20",
+    langs: [] as string[],
+    techs: [] as string[],
+    types: [] as string[],
+    showOnCompanySite: "",
+  });
+  const [bulkApplyFields, setBulkApplyFields] = useState<Record<string, boolean>>({});
+  const [bulkArrayActions, setBulkArrayActions] = useState<Record<"langs" | "techs" | "types", "replace" | "add" | "remove">>({
+    langs: "replace",
+    techs: "replace",
+    types: "replace",
+  });
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -531,11 +723,160 @@ const Dashboard = () => {
       setNewProject((prev) => !prev);
       fetchProjects();
       fetchSources();
+      setSelectedProjects((prev) => prev.filter((pid) => pid !== id));
     } catch (error) {}
+  };
+
+  const handleSelectProject = (id: string) => {
+    setSelectedProjects((prev) => {
+      const next = prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id];
+      if (next.length === 0) setBulkMenuOpen(false);
+      return next;
+    });
+  };
+
+  const hasAllSelected = filteredProjects.length > 0 && filteredProjects.every((p) => selectedProjects.includes(p._id));
+
+  const bulkApplyChanges = async (updates: Record<string, unknown>) => {
+    if (selectedProjects.length === 0) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/projects/bulk-update`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectIds: selectedProjects, updates }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Bulk update failed");
+      }
+
+      setNewProject((prev) => !prev);
+      setSelectedProjects([]);
+      setBulkMenuOpen(false);
+      setBulkEditorOpen(false);
+      setBulkApplyFields({});
+      await fetchProjects();
+      await fetchSources();
+    } catch (error: unknown) {
+      setError(true);
+      window.alert(error instanceof Error ? error.message : "Bulk update failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleBulkField = (field: string) => {
+    setBulkApplyFields((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const toggleBulkValue = (field: "langs" | "techs" | "types", value: string) => {
+    setBulkValues((prev) => {
+      const values = prev[field];
+      return {
+        ...prev,
+        [field]: values.includes(value) ? values.filter((entry) => entry !== value) : [...values, value],
+      };
+    });
+  };
+
+  const submitBulkEdit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const updates: Record<string, unknown> = {};
+    const arrayOperations: Record<string, { action: string; values: string[] }> = {};
+    const textFields = ["title", "developer", "source", "visit", "disc", "rate"] as const;
+
+    textFields.forEach((field) => {
+      if (bulkApplyFields[field]) updates[field] = bulkValues[field];
+    });
+    (["langs", "techs", "types"] as const).forEach((field) => {
+      if (bulkApplyFields[field]) {
+        arrayOperations[field] = { action: bulkArrayActions[field], values: bulkValues[field] };
+      }
+    });
+    if (Object.keys(arrayOperations).length > 0) updates.arrayOperations = arrayOperations;
+    if (bulkApplyFields.visibility) {
+      if (!bulkValues.showOnCompanySite) {
+        window.alert("Choose a visibility value before applying changes.");
+        return;
+      }
+      updates.showOnCompanySite = bulkValues.showOnCompanySite === "true";
+    }
+
+    if (bulkApplyFields.rate) {
+      const rating = Number(bulkValues.rate);
+      if (!Number.isFinite(rating) || rating < 0 || rating > 100) {
+        window.alert("Enter a rating between 0 and 100.");
+        return;
+      }
+      updates.rate = rating;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      window.alert("Choose at least one detail to apply.");
+      return;
+    }
+
+    bulkApplyChanges(updates);
+  };
+
+  const openBulkEditor = () => {
+    setBulkApplyFields({});
+    setBulkValues({
+      title: "",
+      developer: "",
+      source: "",
+      visit: "",
+      disc: "",
+      rate: "20",
+      langs: [],
+      techs: [],
+      types: [],
+      showOnCompanySite: "",
+    });
+    setBulkArrayActions({ langs: "replace", techs: "replace", types: "replace" });
+    setBulkMenuOpen(false);
+    setBulkEditorOpen(true);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedProjects.length === 0) return;
+    const projectNames = selectedProjects.map((id) =>
+      projects.find((project) => project._id === id)?.title || id
+    );
+    if (!window.confirm(`Delete these ${projectNames.length} selected project(s)?\n\n${projectNames.map((name) => `- ${name}`).join("\n")}`)) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/projects/bulk-delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectIds: selectedProjects }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Bulk delete failed");
+      }
+
+      setNewProject((prev) => !prev);
+      setSelectedProjects([]);
+      setBulkMenuOpen(false);
+      await fetchProjects();
+      await fetchSources();
+    } catch (error: unknown) {
+      setError(true);
+      window.alert(error instanceof Error ? error.message : "Bulk delete failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEdit = (project: any) => {
     setActiveTab("projects");
+    setShowProjectForm(true);
     setEditId(project._id);
     setProjectData({
       title: project.title || "",
@@ -565,6 +906,7 @@ const Dashboard = () => {
   };
 
   const handleReset = () => {
+    setShowProjectForm(false);
     setEditId(null);
     setProjectData(initialProjectData);
     setTechs(["html", "css", "javascript"]);
@@ -573,6 +915,8 @@ const Dashboard = () => {
     setRange("20");
     setImageFiles([]);
     setExistingImages([]);
+    setSelectedProjects([]);
+    setBulkMenuOpen(false);
   };
 
   const tabs: { key: TabKey; icon: any; labelKey: string }[] = [
@@ -584,28 +928,52 @@ const Dashboard = () => {
 
   return (
     <PanelWrapper>
-      <PanelHeader>
-        <div className="header-title">{t("admin.panel_title")}</div>
-        <button className="logout-btn" onClick={() => dispatch(signOut())}>
-          <FontAwesomeIcon icon={faRightFromBracket} />
-          {t("admin.logout")}
-        </button>
-      </PanelHeader>
+      <DashboardLayout>
+        <DashboardSidebar>
+          <DashboardBrand>ALOMAWY<span>Admin workspace</span></DashboardBrand>
+          <TabBar>
+            {tabs.map((tab) => (
+              <Tab key={tab.key} $active={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
+                <FontAwesomeIcon icon={tab.icon} />
+                {t(tab.labelKey)}
+              </Tab>
+            ))}
+          </TabBar>
+          <SidebarFooter>Project administration</SidebarFooter>
+        </DashboardSidebar>
 
-      <TabBar>
-        {tabs.map((tab) => (
-          <Tab key={tab.key} $active={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
-            <FontAwesomeIcon icon={tab.icon} />
-            {t(tab.labelKey)}
-          </Tab>
-        ))}
-      </TabBar>
+        <div>
+          <PanelHeader>
+            <div>
+              <div className="header-title">{t(tabs.find((tab) => tab.key === activeTab)?.labelKey || "admin.panel_title")}</div>
+              <div className="header-description">Manage projects, content, visibility, and site settings.</div>
+            </div>
+            <div className="header-actions">
+              <span className="project-total">{projects.length} projects</span>
+              <button
+                type="button"
+                className="create-project-btn"
+                onClick={() => {
+                  handleReset();
+                  setActiveTab("projects");
+                  setShowProjectForm(true);
+                }}
+              >
+                <FontAwesomeIcon icon={faPlus} /> New project
+              </button>
+              <button className="logout-btn" onClick={() => dispatch(signOut())}>
+                <FontAwesomeIcon icon={faRightFromBracket} />
+                {t("admin.logout")}
+              </button>
+            </div>
+          </PanelHeader>
 
-      <TabContent>
+          <TabContent>
         {activeTab === "overview" && <AdminOverview projects={projects} />}
 
         {activeTab === "projects" && (
           <>
+            {showProjectForm && (
             <Styled_Form onSubmit={handleAdd} onReset={handleReset}>
               {cropImage && (
                 <div className="crop-editor" ref={cropEditorRef}>
@@ -818,13 +1186,12 @@ const Dashboard = () => {
                 )}
               </button>
 
-              {editId && (
-                <button type="button" onClick={handleReset} style={{ background: "rgba(255,255,255,0.1)", marginTop: "1rem" }}>
-                  <FontAwesomeIcon icon={faTimes} style={{ marginRight: "10px" }} />
-                  {t("dashboard.cancel")}
-                </button>
-              )}
+              <button type="button" onClick={handleReset} style={{ background: "rgba(255,255,255,0.1)", marginTop: "1rem" }}>
+                <FontAwesomeIcon icon={faTimes} style={{ marginRight: "10px" }} />
+                {t("dashboard.cancel")}
+              </button>
             </Styled_Form>
+            )}
 
             <StyledTable>
               <h3>{t("dashboard.manage_projects")}</h3>
@@ -856,10 +1223,54 @@ const Dashboard = () => {
                 </div>
               </div>
 
+              {selectedProjects.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", margin: "0 0 1rem", padding: "0.85rem 1rem", borderRadius: "12px", background: "rgba(var(--main-color-rgb),0.08)", border: "1px solid rgba(var(--main-color-rgb),0.2)" }}>
+                  <strong style={{ color: "#fff", fontSize: "0.82rem" }}>{selectedProjects.length} selected</strong>
+                  <div style={{ position: "relative", marginLeft: "auto" }}>
+                    <button
+                      type="button"
+                      onClick={() => setBulkMenuOpen((open) => !open)}
+                      aria-expanded={bulkMenuOpen}
+                      style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.65rem 0.85rem", borderRadius: "9px", background: "var(--main-color)", color: "#fff", fontWeight: 700, fontSize: "0.78rem" }}
+                    >
+                      <FontAwesomeIcon icon={faPenToSquare} /> Bulk actions
+                    </button>
+                    {bulkMenuOpen && (
+                      <div style={{ position: "absolute", right: 0, top: "calc(100% + 0.4rem)", zIndex: 5, minWidth: "220px", padding: "0.35rem", borderRadius: "10px", background: "#111a2b", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 14px 34px rgba(0,0,0,0.4)" }}>
+                        <button type="button" onClick={openBulkEditor} style={{ width: "100%", padding: "0.7rem", borderRadius: "7px", textAlign: "left", color: "#f4f6fb", fontSize: "0.78rem" }}>
+                          Edit selected details
+                        </button>
+                        <button type="button" onClick={handleBulkDelete} style={{ width: "100%", padding: "0.7rem", borderRadius: "7px", textAlign: "left", color: "#ff8179", fontSize: "0.78rem" }}>
+                          Delete selected projects
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <button type="button" onClick={() => { setSelectedProjects([]); setBulkMenuOpen(false); }} style={{ padding: "0.6rem 0.75rem", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(226,232,240,0.7)", fontSize: "0.75rem" }}>
+                    Clear selection
+                  </button>
+                </div>
+              )}
+
               <div className="table-wrapper">
                 <table>
                   <thead>
                     <tr>
+                      <th style={{ width: "48px" }}>
+                        <input
+                          type="checkbox"
+                          checked={hasAllSelected}
+                          onChange={() => {
+                            if (hasAllSelected) {
+                              const visibleIds = new Set(filteredProjects.map((project) => project._id));
+                              setSelectedProjects((prev) => prev.filter((id) => !visibleIds.has(id)));
+                            } else {
+                              setSelectedProjects((prev) => [...new Set([...prev, ...filteredProjects.map((project) => project._id)])]);
+                            }
+                          }}
+                          aria-label="Select all projects"
+                        />
+                      </th>
                       <th>{t("dashboard.projectName")}</th>
                       <th>{t("portfolio.type")}</th>
                       <th style={{ textAlign: "right" }}>{t("dashboard.actions")}</th>
@@ -868,8 +1279,12 @@ const Dashboard = () => {
                   <tbody>
                     {filteredProjects.map((project) => {
                       const projectTypes = project.types || [project.type];
+                      const isSelected = selectedProjects.includes(project._id);
                       return (
                         <tr key={project._id}>
+                          <td data-label="Select">
+                            <input type="checkbox" checked={isSelected} onChange={() => handleSelectProject(project._id)} aria-label={`Select ${project.title}`} />
+                          </td>
                           <td data-label={t("dashboard.projectName")}>
                             <div className="project-info">
                               <img src={project.image?.startsWith("/uploads") ? `${API_URL}${project.image}` : project.image || "./assets/project-placeholder.png"} alt="" />
@@ -913,7 +1328,155 @@ const Dashboard = () => {
 
         {activeTab === "statistics" && <AdminStatistics projects={projects} />}
         {activeTab === "settings" && <AdminSettings />}
-      </TabContent>
+          </TabContent>
+        </div>
+      </DashboardLayout>
+
+      {bulkEditorOpen && (
+        <BulkModalOverlay onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setBulkEditorOpen(false);
+        }}>
+          <BulkModal role="dialog" aria-modal="true" aria-labelledby="bulk-editor-title">
+            <form onSubmit={submitBulkEdit}>
+              <BulkModalHeader>
+                <div>
+                  <h2 id="bulk-editor-title">Edit selected projects</h2>
+                  <p>Choose the details to apply to all {selectedProjects.length} selected projects. Unchecked fields stay unchanged.</p>
+                </div>
+                <button type="button" aria-label="Close bulk editor" onClick={() => setBulkEditorOpen(false)} style={{ color: "rgba(226,232,240,0.65)", fontSize: "1.15rem" }}>
+                  <FontAwesomeIcon icon={faXmark} />
+                </button>
+              </BulkModalHeader>
+
+              <BulkModalGrid>
+                {([
+                  ["title", "Project title"],
+                  ["developer", "Developer name"],
+                  ["source", "Idea source"],
+                  ["visit", "Project link"],
+                  ["rate", "Rating (0–100)"],
+                ] as const).map(([field, label]) => (
+                  <BulkField key={field}>
+                    <label className="bulk-field-title">
+                      <input type="checkbox" checked={!!bulkApplyFields[field]} onChange={() => toggleBulkField(field)} />
+                      Apply {label.toLowerCase()}
+                    </label>
+                    {field === "source" ? (
+                      <>
+                        <input
+                        className="bulk-input"
+                        list="bulk-source-options"
+                        value={bulkValues.source}
+                        disabled={!bulkApplyFields.source}
+                        placeholder="Set or clear idea source"
+                        onChange={(event) => setBulkValues((prev) => ({ ...prev, source: event.target.value }))}
+                        />
+                        <datalist id="bulk-source-options">
+                        {sourceOptions.map((source) => <option key={source} value={source} />)}
+                        </datalist>
+                      </>
+                    ) : (
+                      <input
+                        className="bulk-input"
+                        type={field === "visit" ? "url" : field === "rate" ? "number" : "text"}
+                        min={field === "rate" ? 0 : undefined}
+                        max={field === "rate" ? 100 : undefined}
+                        value={bulkValues[field]}
+                        disabled={!bulkApplyFields[field]}
+                        placeholder={field === "rate" ? "0–100" : `Set ${label.toLowerCase()}`}
+                        onChange={(event) => setBulkValues((prev) => ({ ...prev, [field]: event.target.value }))}
+                      />
+                    )}
+                  </BulkField>
+                ))}
+
+                <BulkField className="wide">
+                  <label className="bulk-field-title">
+                    <input type="checkbox" checked={!!bulkApplyFields.disc} onChange={() => toggleBulkField("disc")} />
+                    Apply project description
+                  </label>
+                  <textarea
+                    className="bulk-textarea"
+                    value={bulkValues.disc}
+                    disabled={!bulkApplyFields.disc}
+                    placeholder="Set the description for selected projects"
+                    onChange={(event) => setBulkValues((prev) => ({ ...prev, disc: event.target.value }))}
+                  />
+                </BulkField>
+
+                <BulkField>
+                  <label className="bulk-field-title">
+                    <input type="checkbox" checked={!!bulkApplyFields.visibility} onChange={() => toggleBulkField("visibility")} />
+                    Apply website visibility
+                  </label>
+                  <select
+                    className="bulk-select"
+                    value={bulkValues.showOnCompanySite}
+                    disabled={!bulkApplyFields.visibility}
+                    onChange={(event) => setBulkValues((prev) => ({ ...prev, showOnCompanySite: event.target.value }))}
+                  >
+                    <option value="">Choose visibility</option>
+                    <option value="true">Visible on company website</option>
+                    <option value="false">Hidden from company website</option>
+                  </select>
+                </BulkField>
+
+                {([
+                  ["types", "Project categories", ALL_PROJECT_TYPES],
+                  ["langs", "Languages", languages],
+                  ["techs", "Technologies", [...Object.values(techCategories.frontend).flat(), ...Object.values(techCategories.backend).flat()]],
+                ] as const).map(([field, label, options]) => (
+                  <BulkField className={field === "techs" ? "wide" : ""} key={field}>
+                    <label className="bulk-field-title">
+                      <input type="checkbox" checked={!!bulkApplyFields[field]} onChange={() => toggleBulkField(field)} />
+                      Manage {label.toLowerCase()}
+                    </label>
+                    <select
+                      className="bulk-select"
+                      value={bulkArrayActions[field]}
+                      disabled={!bulkApplyFields[field]}
+                      onChange={(event) => setBulkArrayActions((prev) => ({
+                        ...prev,
+                        [field]: event.target.value as "replace" | "add" | "remove",
+                      }))}
+                      style={{ marginBottom: "0.7rem" }}
+                    >
+                      <option value="replace">Replace existing values</option>
+                      <option value="add">Add selected values</option>
+                      <option value="remove">Remove selected values</option>
+                    </select>
+                    <BulkChoiceGrid className={!bulkApplyFields[field] ? "disabled" : ""}>
+                      {options.map((option) => (
+                        <BulkChoice key={option}>
+                          <input
+                            type="checkbox"
+                            checked={bulkValues[field].includes(option)}
+                            disabled={!bulkApplyFields[field]}
+                            onChange={() => toggleBulkValue(field, option)}
+                          />
+                          {field === "types" ? t(`portfolio.category.${option}`) : option}
+                        </BulkChoice>
+                      ))}
+                    </BulkChoiceGrid>
+                    {bulkApplyFields[field] && bulkArrayActions[field] === "replace" && bulkValues[field].length === 0 && (
+                      <small style={{ display: "block", marginTop: "0.55rem", color: "#f1ba68", fontSize: "0.68rem" }}>
+                        No selected values will clear this field for the selected projects.
+                      </small>
+                    )}
+                  </BulkField>
+                ))}
+              </BulkModalGrid>
+
+              <BulkModalFooter>
+                <button type="button" className="cancel" onClick={() => setBulkEditorOpen(false)}>Cancel</button>
+                <button type="submit" className="save" disabled={loading}>
+                  {loading ? "Applying…" : "Apply changes"}
+                </button>
+              </BulkModalFooter>
+            </form>
+          </BulkModal>
+        </BulkModalOverlay>
+      )}
     </PanelWrapper>
   );
 };
