@@ -61,6 +61,187 @@ router.get('/sources', async (req, res) => {
   }
 });
 
+// Bulk update selected projects
+router.patch('/bulk-update', async (req, res) => {
+  try {
+    const { projectIds, updates } = req.body || {};
+
+    if (!Array.isArray(projectIds) || projectIds.length === 0 || projectIds.some((id) => typeof id !== 'string' || !id)) {
+      return res.status(400).json({ message: 'projectIds must be a non-empty array' });
+    }
+    const uniqueProjectIds = [...new Set(projectIds)];
+
+    if (!updates || typeof updates !== 'object' || Array.isArray(updates)) {
+      return res.status(400).json({ message: 'updates object is required' });
+    }
+
+    const updateData = {};
+    const arrayOperations = updates.arrayOperations || {};
+
+    for (const field of ['title', 'developer', 'source', 'visit', 'disc']) {
+      if (Object.prototype.hasOwnProperty.call(updates, field)) {
+        if (typeof updates[field] !== 'string') {
+          return res.status(400).json({ message: `${field} must be a string` });
+        }
+        updateData[field] = updates[field];
+      }
+    }
+
+    if (updates.showOnCompanySite !== undefined) {
+      if (![true, false, 'true', 'false'].includes(updates.showOnCompanySite)) {
+        return res.status(400).json({ message: 'showOnCompanySite must be a boolean' });
+      }
+      updateData.show_on_company_site = updates.showOnCompanySite === true || updates.showOnCompanySite === 'true';
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updates, 'rate')) {
+      const rate = Number(updates.rate);
+      if (!Number.isFinite(rate) || rate < 0 || rate > 100) {
+        return res.status(400).json({ message: 'rate must be between 0 and 100' });
+      }
+      updateData.rate = rate;
+    }
+
+    if (updates.types !== undefined) {
+      const parsedTypes = Array.isArray(updates.types) ? updates.types : JSON.parse(updates.types);
+      if (!Array.isArray(parsedTypes)) throw new Error('types must be an array');
+      updateData.type = JSON.stringify(parsedTypes);
+    }
+
+    if (updates.langs !== undefined) {
+      const parsedLangs = Array.isArray(updates.langs) ? updates.langs : JSON.parse(updates.langs);
+      if (!Array.isArray(parsedLangs)) throw new Error('langs must be an array');
+      updateData.langs = parsedLangs;
+    }
+
+    if (updates.techs !== undefined) {
+      const parsedTechs = Array.isArray(updates.techs) ? updates.techs : JSON.parse(updates.techs);
+      if (!Array.isArray(parsedTechs)) throw new Error('techs must be an array');
+      updateData.techs = parsedTechs;
+    }
+
+    const arrayFields = {
+      types: 'type',
+      langs: 'langs',
+      techs: 'techs',
+    };
+    const normalizedOperations = {};
+
+    if (!arrayOperations || typeof arrayOperations !== 'object' || Array.isArray(arrayOperations)) {
+      return res.status(400).json({ message: 'arrayOperations must be an object' });
+    }
+
+    for (const [field, operation] of Object.entries(arrayOperations)) {
+      if (!Object.prototype.hasOwnProperty.call(arrayFields, field)) {
+        return res.status(400).json({ message: `Unsupported array operation: ${field}` });
+      }
+      if (
+        !operation ||
+        !['replace', 'add', 'remove'].includes(operation.action) ||
+        !Array.isArray(operation.values) ||
+        operation.values.some((value) => typeof value !== 'string')
+      ) {
+        return res.status(400).json({ message: `Invalid array operation for ${field}` });
+      }
+      normalizedOperations[field] = {
+        column: arrayFields[field],
+        action: operation.action,
+        values: operation.values,
+      };
+    }
+
+    if (Object.keys(updateData).length === 0 && Object.keys(normalizedOperations).length === 0) {
+      return res.status(400).json({ message: 'No supported update fields were provided' });
+    }
+
+    if (Object.keys(normalizedOperations).length > 0) {
+      const { data: rows, error: findError } = await getClient()
+        .from(TABLE)
+        .select('id, type, langs, techs')
+        .in('id', uniqueProjectIds);
+
+      if (findError) throw findError;
+
+      const parseArray = (value) => {
+        if (Array.isArray(value)) return value;
+        if (typeof value !== 'string' || value.length === 0) return [];
+        try {
+          const parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed : [value];
+        } catch {
+          return [value];
+        }
+      };
+
+      const results = await Promise.all((rows || []).map(async (row) => {
+        const projectUpdates = { ...updateData };
+
+        for (const operation of Object.values(normalizedOperations)) {
+          const currentValues = parseArray(row[operation.column]);
+          let nextValues;
+
+          if (operation.action === 'replace') {
+            nextValues = operation.values;
+          } else if (operation.action === 'add') {
+            nextValues = [...new Set([...currentValues, ...operation.values])];
+          } else {
+            const removed = new Set(operation.values);
+            nextValues = currentValues.filter((value) => !removed.has(value));
+          }
+
+          projectUpdates[operation.column] = operation.column === 'type'
+            ? JSON.stringify(nextValues)
+            : nextValues;
+        }
+
+        const { error } = await getClient()
+          .from(TABLE)
+          .update(projectUpdates)
+          .eq('id', row.id);
+
+        if (error) throw error;
+        return row.id;
+      }));
+
+      return res.json({ message: `Updated ${results.length} projects` });
+    }
+
+    const { error } = await getClient()
+      .from(TABLE)
+      .update(updateData)
+      .in('id', uniqueProjectIds);
+
+    if (error) throw error;
+
+    res.json({ message: `Updated ${uniqueProjectIds.length} projects` });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Bulk delete selected projects
+router.post('/bulk-delete', async (req, res) => {
+  try {
+    const { projectIds } = req.body || {};
+
+    if (!Array.isArray(projectIds) || projectIds.length === 0 || projectIds.some((id) => typeof id !== 'string' || !id)) {
+      return res.status(400).json({ message: 'projectIds must be a non-empty array' });
+    }
+    const uniqueProjectIds = [...new Set(projectIds)];
+
+    const { error } = await getClient()
+      .from(TABLE)
+      .delete()
+      .in('id', uniqueProjectIds);
+
+    if (error) throw error;
+
+    res.json({ message: `Deleted ${uniqueProjectIds.length} projects` });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Add a new project
 router.post('/', upload.array('images', 10), async (req, res) => {
   const { title, developer, source, visit, disc, rate, langs, techs, types, type, date, showOnCompanySite } = req.body;
