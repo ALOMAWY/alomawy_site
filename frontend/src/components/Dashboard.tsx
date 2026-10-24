@@ -62,6 +62,8 @@ const languages = ["arabic", "english"];
 
 const PanelWrapper = styled.div`
   min-height: 100vh;
+  width: 100%;
+  overflow-x: clip;
   color: #f4f6fb;
   background: #0b1220;
 `;
@@ -139,9 +141,11 @@ const PanelHeader = styled.div`
     padding: 1rem;
   }
   @media (max-width: 560px) {
-    .header-actions { width: 100%; }
-    .project-total { margin-right: auto; }
-    .logout-btn { padding: 0.7rem; }
+    align-items: flex-start;
+    .header-actions { width: 100%; flex-wrap: wrap; }
+    .project-total { width: 100%; }
+    .create-project-btn { flex: 1; justify-content: center; }
+    .logout-btn { padding: 0.7rem 0.85rem; }
   }
 `;
 
@@ -194,6 +198,10 @@ const BulkModalOverlay = styled.div`
   padding: 1rem;
   background: rgba(3, 8, 16, 0.78);
   backdrop-filter: blur(8px);
+  @media (max-width: 640px) {
+    place-items: start center;
+    padding: max(0.5rem, env(safe-area-inset-top)) 0.5rem max(0.5rem, env(safe-area-inset-bottom));
+  }
 `;
 
 const BulkModal = styled.div`
@@ -205,6 +213,11 @@ const BulkModal = styled.div`
   background: #111a2b;
   box-shadow: 0 24px 80px rgba(0,0,0,0.55);
   color: #f4f6fb;
+  @media (max-width: 640px) {
+    width: 100%;
+    max-height: calc(100dvh - 1rem);
+    border-radius: 14px;
+  }
 `;
 
 const BulkModalHeader = styled.div`
@@ -220,6 +233,7 @@ const BulkModalHeader = styled.div`
   border-bottom: 1px solid rgba(255,255,255,0.08);
   h2 { font-size: 1.05rem; font-weight: 750; }
   p { color: rgba(226,232,240,0.55); font-size: 0.78rem; margin-top: 0.35rem; }
+  @media (max-width: 640px) { padding: 1rem; }
 `;
 
 const BulkModalGrid = styled.div`
@@ -227,7 +241,7 @@ const BulkModalGrid = styled.div`
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.85rem;
   padding: 1.25rem 1.5rem;
-  @media (max-width: 640px) { grid-template-columns: 1fr; padding: 1rem; }
+  @media (max-width: 640px) { grid-template-columns: minmax(0, 1fr); padding: 0.75rem; gap: 0.6rem; }
 `;
 
 const BulkField = styled.div`
@@ -245,6 +259,7 @@ const BulkField = styled.div`
     &:disabled { opacity: 0.38; cursor: not-allowed; }
   }
   .bulk-textarea { min-height: 88px; resize: vertical; }
+  @media (max-width: 640px) { padding: 0.75rem; }
 `;
 
 const BulkChoiceGrid = styled.div`
@@ -279,6 +294,10 @@ const BulkModalFooter = styled.div`
   button { padding: 0.7rem 1rem; border-radius: 9px; font-size: 0.78rem; font-weight: 650; }
   .cancel { border: 1px solid rgba(255,255,255,0.12); color: rgba(226,232,240,0.75); }
   .save { background: var(--main-color); color: #fff; }
+  @media (max-width: 640px) {
+    padding: 0.75rem;
+    button { flex: 1; }
+  }
 `;
 
 const Styled_Form = styled.form`
@@ -292,7 +311,7 @@ const Styled_Form = styled.form`
     h2 { font-size: 1.1rem; font-weight: 750; letter-spacing: -0.01em; opacity: 0.96; }
     .line { display: none; }
   }
-  .grid-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; @media (max-width: 768px) { grid-template-columns: 1fr; } }
+  .grid-section { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; @media (max-width: 768px) { grid-template-columns: minmax(0, 1fr); } }
   .input-group { display: flex; flex-direction: column; gap: 0.75rem;
     label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; margin-left: 1rem; }
     .field { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
@@ -384,13 +403,15 @@ const Styled_Form = styled.form`
     &:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); } }
   @media (max-width: 768px) {
     .header h2 { font-size: 1.2rem; }
-    .input-group label { margin-left: 0; justify-content: center; display: flex; }
-    .selection-box .title { justify-content: center; }
-    .selection-box .options { justify-content: center; }
-    .selection-box.image-upload-container { justify-content: center; }
-    .image-upload-container { justify-content: center; }
+    .input-group label { margin-left: 0.15rem; justify-content: flex-start; display: flex; }
+    .input-group .field { gap: 0.65rem; padding: 0.8rem 0.9rem; border-radius: 12px; }
+    .selection-box { padding: 1rem; border-radius: 16px; }
+    .selection-box .title { justify-content: flex-start; margin-bottom: 1rem; }
+    .selection-box .options { justify-content: flex-start; gap: 0.55rem; }
     .grid-section { grid-template-columns: 1fr; }
-    .image-thumb { width: 150px; height: 84px; }
+    .image-upload-container { justify-content: flex-start; gap: 1rem; }
+    .image-thumb { width: min(150px, 42vw); height: auto; aspect-ratio: 16 / 9; }
+    button[type="submit"] { padding: 1rem; border-radius: 14px; font-size: 0.85rem; letter-spacing: 0.08em; }
   }
 `;
 
@@ -398,6 +419,25 @@ const StyledTable = styled.div`
   margin-top: 2rem; overflow: hidden;
   h3 { text-align: left; margin-bottom: 1.1rem; font-size: 1rem; font-weight: 750;
     letter-spacing: -0.01em; color: #f4f6fb; }
+  .bulk-selection-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    background: rgba(var(--main-color-rgb),0.08);
+    border: 1px solid rgba(var(--main-color-rgb),0.2);
+  }
+  .bulk-selection-actions { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+  .bulk-menu {
+    position: absolute; right: 0; top: calc(100% + 0.4rem); z-index: 5; min-width: 220px; padding: 0.35rem;
+    border-radius: 10px; background: #111a2b; border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.4);
+    button { width: 100%; padding: 0.7rem; border-radius: 7px; text-align: left; font-size: 0.78rem; }
+    .edit-selected { color: #f4f6fb; }
+    .delete-selected { color: #ff8179; }
+  }
   .toolbar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
     .search-box { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 0.75rem;
       padding: 0.75rem 1.25rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
@@ -420,7 +460,13 @@ const StyledTable = styled.div`
       background: rgba(var(--main-color-rgb), 0.08); border: 1px solid rgba(var(--main-color-rgb), 0.15);
       border-radius: 14px; font-size: 0.7rem; font-weight: 900; color: var(--main-color); white-space: nowrap;
       span { opacity: 0.4; margin-left: 0.35rem; } }
-    @media (max-width: 768px) { flex-direction: column; .search-box { min-width: unset; } }
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0.65rem;
+      .search-box, .filter-select, .sort-select, .count-badge { width: 100%; min-width: 0; }
+      .filter-select, .sort-select { justify-content: space-between; }
+      .count-badge { justify-content: center; }
+    }
   }
   .table-wrapper { overflow-x: auto; width: 100%; scrollbar-width: thin;
     scrollbar-color: var(--main-color) rgba(255,255,255,0.05);
@@ -452,24 +498,79 @@ const StyledTable = styled.div`
         &.edit { color: #3498db; &:hover { background: rgba(52,152,219,0.15); border-color: #3498db; transform: translateY(-2px); } }
         &.delete { color: #e74c3c; &:hover { background: rgba(231,76,60,0.15); border-color: #e74c3c; transform: translateY(-2px); } } } } }
   @media (max-width: 768px) {
-    table, thead, tbody, th, td, tr { display: block; width: 100%; min-width: unset; }
+    table, thead, tbody, th, td, tr { display: block; width: 100%; min-width: 0; }
     thead { display: none; }
-    tr { background: rgba(255,255,255,0.05); backdrop-filter: var(--q-blur-dashboard-mobile);
-      border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08);
-      display: flex; flex-direction: column; box-sizing: border-box; }
-    td { padding: 1rem 0; background: transparent !important; display: grid !important;
-      grid-template-columns: 1fr auto; align-items: center; border: none !important;
-      border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-      &:first-child { padding-top: 0; border-radius: 0; }
-      &:last-child { padding-bottom: 0; border-bottom: none !important; border-radius: 0; }
-      &::before { content: attr(data-label) ": "; font-size: 0.7rem; text-transform: uppercase; opacity: 0.4;
-        font-weight: 900; letter-spacing: 0.15em; color: #fff; }
-      &:first-child { display: flex !important; justify-content: flex-start; gap: 1.5rem;
-        &::before { display: none; }
-        .project-info { width: 100%; .title { font-size: 1.1rem; font-weight: 800; color: #3498db; white-space: normal; } } }
-      .type-badges, .actions { justify-self: end; }
-      .actions { button { width: 48px; height: 48px; border-radius: 16px; &.edit { color: #3498db; } &.delete { color: #e74c3c; } } } }
-    tr:hover td { transform: none; } }
+    tbody { display: grid; gap: 0.75rem; }
+    tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      background: rgba(17, 26, 43, 0.72);
+    }
+    td {
+      display: flex !important;
+      min-width: 0;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.7rem 0;
+      border: 0 !important;
+      border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      &::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        color: rgba(226,232,240,0.45);
+        font-size: 0.65rem;
+        font-weight: 650;
+        letter-spacing: 0.02em;
+        text-transform: none;
+      }
+      &:first-child {
+        order: -1;
+        justify-content: flex-start;
+        padding-top: 0;
+        &::before { content: none; }
+      }
+      &:nth-child(2) {
+        order: 0;
+        padding-top: 0;
+        &::before { content: none; }
+      }
+      &:last-child { border-bottom: 0 !important; padding-bottom: 0; }
+    }
+    .project-info {
+      min-width: 0;
+      width: 100%;
+      gap: 0.75rem;
+      img { width: 48px; height: 48px; border-radius: 10px; }
+      .title {
+        min-width: 0;
+        max-width: none;
+        flex: 1;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        font-size: 0.82rem;
+        letter-spacing: 0;
+      }
+    }
+    .type-badges { justify-content: flex-end; min-width: 0; }
+    .actions {
+      button { width: 40px; height: 40px; border-radius: 10px; }
+    }
+    tr:hover td { transform: none; }
+  }
+  @media (max-width: 420px) {
+    .bulk-selection-toolbar { flex-wrap: wrap; }
+    .bulk-selection-actions { width: 100%; justify-content: stretch; }
+    .bulk-selection-actions > button:first-child { flex: 1; }
+    .bulk-menu { left: 0; right: auto !important; width: min(240px, calc(100vw - 2rem)); }
+  }
 `;
 
 type TabKey = "overview" | "projects" | "statistics" | "settings";
@@ -1224,9 +1325,10 @@ const Dashboard = () => {
               </div>
 
               {selectedProjects.length > 0 && (
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", margin: "0 0 1rem", padding: "0.85rem 1rem", borderRadius: "12px", background: "rgba(var(--main-color-rgb),0.08)", border: "1px solid rgba(var(--main-color-rgb),0.2)" }}>
+                <div className="bulk-selection-toolbar">
                   <strong style={{ color: "#fff", fontSize: "0.82rem" }}>{selectedProjects.length} selected</strong>
-                  <div style={{ position: "relative", marginLeft: "auto" }}>
+                  <div className="bulk-selection-actions">
+                    <div style={{ position: "relative" }}>
                     <button
                       type="button"
                       onClick={() => setBulkMenuOpen((open) => !open)}
@@ -1236,11 +1338,11 @@ const Dashboard = () => {
                       <FontAwesomeIcon icon={faPenToSquare} /> Bulk actions
                     </button>
                     {bulkMenuOpen && (
-                      <div style={{ position: "absolute", right: 0, top: "calc(100% + 0.4rem)", zIndex: 5, minWidth: "220px", padding: "0.35rem", borderRadius: "10px", background: "#111a2b", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 14px 34px rgba(0,0,0,0.4)" }}>
-                        <button type="button" onClick={openBulkEditor} style={{ width: "100%", padding: "0.7rem", borderRadius: "7px", textAlign: "left", color: "#f4f6fb", fontSize: "0.78rem" }}>
+                      <div className="bulk-menu">
+                        <button className="edit-selected" type="button" onClick={openBulkEditor}>
                           Edit selected details
                         </button>
-                        <button type="button" onClick={handleBulkDelete} style={{ width: "100%", padding: "0.7rem", borderRadius: "7px", textAlign: "left", color: "#ff8179", fontSize: "0.78rem" }}>
+                        <button className="delete-selected" type="button" onClick={handleBulkDelete}>
                           Delete selected projects
                         </button>
                       </div>
@@ -1249,6 +1351,7 @@ const Dashboard = () => {
                   <button type="button" onClick={() => { setSelectedProjects([]); setBulkMenuOpen(false); }} style={{ padding: "0.6rem 0.75rem", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(226,232,240,0.7)", fontSize: "0.75rem" }}>
                     Clear selection
                   </button>
+                  </div>
                 </div>
               )}
 
