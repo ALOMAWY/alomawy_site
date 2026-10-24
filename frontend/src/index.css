@@ -148,9 +148,9 @@ input[type="checkbox"] {
   flex: 0 0 18px;
   display: inline-grid;
   place-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid #aeb9c9;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.04);
+  background: #fff;
   color: #fff;
   vertical-align: middle;
   cursor: pointer;

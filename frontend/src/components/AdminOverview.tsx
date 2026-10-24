@@ -26,15 +26,15 @@ interface AdminOverviewProps {
 
 const Container = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
   gap: 1.25rem;
   margin-bottom: 2rem;
 `;
 
 const Card = styled.div<{ $accent?: string }>`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #e3e8f0;
+  border-radius: 13px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -49,22 +49,22 @@ const Card = styled.div<{ $accent?: string }>`
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: ${props => props.$accent || 'var(--main-color)'};
     opacity: 0.6;
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: #fbfcfe;
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: #cfd9e7;
   }
 
   .card-icon {
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    background: rgba(var(--main-color-rgb), 0.1);
+    background: #edf2f9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -75,34 +75,34 @@ const Card = styled.div<{ $accent?: string }>`
   .card-value {
     font-size: 2rem;
     font-weight: 900;
-    color: #fff;
+    color: #1f2f49;
     line-height: 1;
   }
 
   .card-label {
     font-size: 0.7rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.5;
-    color: #fff;
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 1;
+    color: #7c899e;
   }
 `;
 
 const RecentSection = styled.div`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #e3e8f0;
+  border-radius: 13px;
   padding: 1.5rem;
   margin-top: 1rem;
 
   h3 {
     font-size: 0.8rem;
     font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.5;
-    color: #fff;
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 1;
+    color: #53637c;
     margin-bottom: 1rem;
   }
 `;
@@ -112,7 +112,7 @@ const RecentItem = styled.div`
   align-items: center;
   gap: 1rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid #edf0f5;
 
   &:last-child {
     border-bottom: none;
@@ -123,7 +123,7 @@ const RecentItem = styled.div`
     height: 36px;
     border-radius: 8px;
     object-fit: cover;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid #e3e8f0;
   }
 
   .recent-info {
@@ -133,7 +133,7 @@ const RecentItem = styled.div`
     .recent-title {
       font-size: 0.85rem;
       font-weight: 700;
-      color: #fff;
+      color: #273750;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -142,10 +142,10 @@ const RecentItem = styled.div`
     .recent-type {
       font-size: 0.65rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.4;
-      color: #fff;
+      text-transform: none;
+      letter-spacing: 0;
+      opacity: 1;
+      color: #8190a5;
     }
   }
 

@@ -34,21 +34,25 @@ const StatsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  color: #34445f;
+  svg text { fill: #738097 !important; }
+  .recharts-cartesian-grid line { stroke: #edf0f5; }
+  .recharts-cartesian-axis-line, .recharts-cartesian-axis-tick-line { stroke: #dfe5ee; }
 `;
 
 const SectionTitle = styled.h3`
   font-size: 0.75rem;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  opacity: 0.4;
-  color: #fff;
+  letter-spacing: 0.03em;
+  opacity: 1;
+  color: #53637c;
   margin-bottom: 0.5rem;
 `;
 
 const ChartGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
   gap: 1.5rem;
 
   @media (max-width: 480px) {
@@ -57,36 +61,36 @@ const ChartGrid = styled.div`
 `;
 
 const ChartCard = styled.div`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #e3e8f0;
+  border-radius: 13px;
   padding: 1.5rem;
   transition: all var(--q-transition-speed) var(--q-transition-ease);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: #fbfcfe;
   }
 
   .chart-title {
     font-size: 0.7rem;
     font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.5;
-    color: #fff;
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 1;
+    color: #75829a;
     margin-bottom: 1rem;
   }
 
   .chart-value {
     font-size: 2rem;
     font-weight: 900;
-    color: #fff;
+    color: #1f2f49;
   }
 
   .chart-subtitle {
     font-size: 0.7rem;
-    opacity: 0.4;
-    color: #fff;
+    opacity: 1;
+    color: #8290a4;
     margin-top: 0.25rem;
   }
 `;
@@ -101,15 +105,15 @@ const RankList = styled.div`
     align-items: center;
     gap: 1rem;
     padding: 0.6rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid #edf0f5;
 
     &:last-child { border-bottom: none; }
 
     .rank-num {
       font-size: 0.65rem;
       font-weight: 900;
-      opacity: 0.3;
-      color: #fff;
+      opacity: 1;
+      color: #8290a4;
       width: 20px;
     }
 
@@ -117,7 +121,7 @@ const RankList = styled.div`
       flex: 1;
       font-size: 0.8rem;
       font-weight: 700;
-      color: #fff;
+      color: #34445f;
     }
 
     .rank-bar {
@@ -141,11 +145,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
-      background: 'rgba(0,0,0,0.85)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '12px',
+      background: '#fff',
+      border: '1px solid #dfe6ef',
+      borderRadius: '10px',
       padding: '0.75rem 1rem',
-      color: '#fff',
+      color: '#34445f',
       fontSize: '0.75rem',
     }}>
       <div style={{ fontWeight: 900, marginBottom: '0.25rem' }}>{label}</div>

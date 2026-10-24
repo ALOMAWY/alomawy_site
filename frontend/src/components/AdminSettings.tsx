@@ -11,24 +11,24 @@ const Container = styled.div`
 
 const SectionTitle = styled.h3`
   font-size: 0.75rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  opacity: 0.4;
-  color: #fff;
+  font-weight: 800;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  opacity: 1;
+  color: #53637c;
   margin-bottom: 0.5rem;
 `;
 
 const CardGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 1.5rem;
 `;
 
 const PlaceholderCard = styled.div`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #e3e8f0;
+  border-radius: 13px;
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -49,15 +49,15 @@ const PlaceholderCard = styled.div`
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: #fbfcfe;
+    border-color: #cfd9e7;
   }
 
   .card-icon {
     width: 44px;
     height: 44px;
     border-radius: 14px;
-    background: rgba(var(--main-color-rgb), 0.1);
+    background: #edf2f9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,14 +68,14 @@ const PlaceholderCard = styled.div`
   .card-title {
     font-size: 0.9rem;
     font-weight: 800;
-    color: #fff;
+    color: #273750;
   }
 
   .card-desc {
     font-size: 0.75rem;
     line-height: 1.6;
-    opacity: 0.4;
-    color: #fff;
+    opacity: 1;
+    color: #7c899e;
   }
 
   .coming-soon {
@@ -83,14 +83,14 @@ const PlaceholderCard = styled.div`
     align-items: center;
     gap: 0.5rem;
     padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.05);
+    background: #eef1f5;
     border-radius: 10px;
     font-size: 0.6rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 1px;
-    opacity: 0.3;
-    color: #fff;
+    opacity: 1;
+    color: #8290a4;
     width: fit-content;
     margin-top: 0.5rem;
   }
